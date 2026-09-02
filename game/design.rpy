@@ -1,30 +1,34 @@
 # =========================================================================
 # VISUAL DESIGN LAYER
-# Preserves all existing dialogue and menu strings.
+# Bestehende Dialog- und Menütexte werden nicht verändert.
 # =========================================================================
 
 image bg_room = "images/backgrounds/room.svg"
+image bg_hallway = "images/backgrounds/hallway.svg"
 image bg_park = "images/backgrounds/park.svg"
 image bg_university = "images/backgrounds/university.svg"
+image bg_pharmacy = "images/backgrounds/pharmacy.svg"
+image bg_gym = "images/backgrounds/gym.svg"
+image bg_church = "images/backgrounds/church.svg"
+image bg_market = "images/backgrounds/market.svg"
 
 init python:
-    # Use the new vector artwork without changing any script text.
     gui.main_menu_background = "gui/main_menu.svg"
     gui.game_menu_background = "images/backgrounds/room.svg"
 
     def _design_label_callback(label_name, jumped):
-        """Select a visual backdrop when entering major locations."""
+        """Select a visual backdrop for major locations without changing script text."""
         backgrounds = {
-            "wohnheim_flur": "bg_room",
+            "wohnheim_flur": "bg_hallway",
             "mein_zimmer": "bg_room",
             "mein_zimmer_schlafen": "bg_room",
             "sarahs_zimmer": "bg_room",
             "krause_buero": "bg_room",
-            "apotheke": "bg_room",
-            "sportstudio": "bg_room",
+            "apotheke": "bg_pharmacy",
+            "sportstudio": "bg_gym",
             "gemeinschaftsdusche": "bg_room",
-            "stadtkirche": "bg_room",
-            "wochenend_markt": "bg_room",
+            "stadtkirche": "bg_church",
+            "wochenend_markt": "bg_market",
             "arbeiten": "bg_room",
             "universitaet": "bg_university",
             "stadtpark": "bg_park",
@@ -43,7 +47,7 @@ style matrix_panel:
     padding (18, 14)
 
 style matrix_title:
-    color "#ffffff"
+    color "#7ff7d4"
     size 25
     bold True
 
@@ -63,7 +67,7 @@ style matrix_button:
     yminimum 42
     padding (14, 8)
     text_color "#dce8f7"
-    text_hover_color "#ffffff"
+    text_hover_color "#7ff7d4"
 
 style matrix_choice_button:
     background Frame(Solid("#0a1320e8"), 16, 16)
@@ -75,7 +79,7 @@ style matrix_choice_button:
 
 style matrix_choice_text:
     color "#edf4ff"
-    hover_color "#ffffff"
+    hover_color "#7ff7d4"
     size 21
     xalign 0.5
     text_align 0.5
@@ -86,7 +90,7 @@ style matrix_say_window:
     outlines [(1, "#ffffff18", 0, 0)]
 
 style matrix_say_name:
-    color "#ffffff"
+    color "#7ff7d4"
     size 29
     bold True
 
