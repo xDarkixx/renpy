@@ -63,37 +63,37 @@ label start:
     m "Ein neues Semester im Wohnheim beginnt. Mal sehen, wohin das alles führt."
     jump wohnheim_flur
 
+
+# =========================================================================
+# 4. HAUPT-HUB (ORTSAUSWAHL)
+# =========================================================================
+
 label wohnheim_flur:
     $ tag_name = wochentage[aktueller_tag_index]
-
+    
+    # Miet-Check am Sonntagabend durch die Vermieterin
     if tag_name == "Sonntag" and tageszeit == "Abend" and not miete_bezahlt:
         jump krause_miete_event
 
+    # AUTOMATISCHE SCHWANGERSCHAFTSTEST-TRIGGERS (Nach 3 Tagen)
     if sarah_schwanger and sarah_tage_seit_sex >= 3 and not sarah_test_verlangt:
         jump sarah_test_trigger_event
 
     if krause_schwanger and krause_tage_seit_sex >= 3 and not krause_test_verlangt:
         jump krause_test_trigger_event
 
-    if berg_schwanger and berg_tage_seit_sex >= 3 and not berg_test_verlangt:
-        jump berg_test_trigger_event
-
-    if elena_schwanger and elena_tage_seit_sex >= 3 and not elena_test_verlangt:
-        jump elena_test_trigger_event
-
+    # ZUFÄLLIGES BETTEL-EVENT (Triggert nachts auf dem Flur, wenn Korruption sehr hoch ist)
     if tageszeit == "Nacht" and sarah_korruption >= 35 and renpy.random.randint(1, 100) <= 30:
         jump sarah_bettelt_event
 
     if tageszeit == "Nacht" and krause_korruption >= 35 and renpy.random.randint(1, 100) <= 30:
         jump krause_bettelt_event
 
-    "Status: [tag_name] ([tageszeit]) | Geld: [geld]$ | Energie: [energie]/[max_energie]"
+    "Status: [tag_name] ([tageszeit]) | Geld: [geld]$ | Energie: [energie]%%"
     "Mädels-Status:"
-    "Sarah - Korruption: [sarah_korruption] | Outfit aktiv: [sarah_traegt_outfit]"
-    "Frau Krause - Korruption: [krause_korruption] | Outfit aktiv: [krause_traegt_outfit]"
-    "Frau Berg (Lehrerin) - Korruption: [berg_korruption]"
-    "Elena (Park) - Korruption: [elena_korruption]"
-
+    "Sarah - Korruption: [sarah_korruption] | Schwanger: [sarah_schwanger]"
+    "Frau Krause - Korruption: [krause_korruption] | Schwanger: [krause_schwanger]"
+    
     if energie <= 0:
         "Du bist völlig erschöpft! Du musst dich in deinem Zimmer ausruhen."
         jump mein_zimmer_schlafen
@@ -108,59 +108,68 @@ label wohnheim_flur:
 
     menu:
         "Wohin möchtest du gehen?"
+        
         "[zimmer_button_text]":
             jump mein_zimmer
+            
         "In Sarahs Zimmer":
             jump sarahs_zimmer
+            
         "In das Büro der Vermieterin":
             jump krause_buero
-        "Zur Universität gehen" if tageszeit == "Morgen" or tageszeit == "Nachmittag":
-            jump universitaet
-        "Zum Stadtpark gehen (Elena)" if tageszeit == "Nachmittag" or tageszeit == "Abend":
-            jump stadtpark
-        "Zum Sportstudio gehen" if tageszeit == "Nachmittag" or tageszeit == "Abend":
-            jump sportstudio
+            
         "In die Gemeinschaftsdusche":
             jump gemeinschaftsdusche
+            
         "Zur Apotheke gehen" if tageszeit != "Nacht":
             jump apotheke
+            
         "Zum Samstags-Markt gehen" if tag_name == "Samstag" or tag_name == "Sonntag":
             jump wochenend_markt
+            
         "Arbeiten gehen (+50$, kostet 40 Energie)" if tageszeit != "Nacht" and not heute_gearbeitet:
             jump arbeiten
 
+
+# =========================================================================
+# 5. ORT: MEIN ZIMMER, SCHLAFEN & HANDY
+# =========================================================================
+
 label mein_zimmer:
     "Du bist in deinem Zimmer."
+    
     if neue_nachrichten_anzahl > 0:
         $ handy_button_text = "Handy benutzen [" + str(neue_nachrichten_anzahl) + "] NEU"
     else:
         $ handy_button_text = "Handy benutzen"
+
     menu:
         "[handy_button_text]":
             jump handy_menue
-        "In den Rucksack schauen (Inventar & Items benutzen)":
+            
+        "In den Rucksack schauen (Inventar)":
             jump rucksack_ansehen
+        
         "Im Bett schlafen (Energie aufladen & Zeit voranschreiten lassen)":
             jump mein_zimmer_schlafen
+            
         "Zurück auf den Flur":
             jump wohnheim_flur
 
 label handy_menue:
     "--- SMARTPHONE ---"
     menu:
-        "Spionage-App (Werte & Maße)":
-            "--- BIOMETRISCHE DATENBANK ---"
-            "Sarah - Korruption: [sarah_korruption] | Oberweite: 85C"
-            "Frau Krause - Korruption: [krause_korruption] | Oberweite: 95E"
-            "Frau Berg (Lehrerin) - Korruption: [berg_korruption] | Oberweite: 90D"
-            "Elena (Park) - Korruption: [elena_korruption] | Oberweite: 100F"
+        "Posteingang lesen" if neue_nachrichten_anzahl > 0:
+            $ neue_nachrichten_anzahl = 0
+            s_handy "Hey Max! Komm heute mal in mein Zimmer, wenn du Zeit hast."
             jump handy_menue
-        "SMS-Messenger":
-            jump handy_sms_menue
-        "Online-Shop (Lieferdienst)":
-            jump handy_shop_menue
-        "Amor's Choice (Sex-Shop App)":
-            jump handy_sexshop_app
+            
+        "Sarah eine SMS schreiben" if neue_nachrichten_anzahl == 0:
+            jump handy_sarah_chat
+            
+        "Frau Krause eine SMS schreiben" if krause_korruption >= 5:
+            jump handy_krause_chat
+            
         "Handy weglegen":
             jump mein_zimmer
 
@@ -212,29 +221,17 @@ label handy_sexshop_app:
 label rucksack_ansehen:
     if not inventar:
         "Dein Rucksack ist komplett leer."
-        jump mein_zimmer
-    "Im Rucksack befindet sich aktuell:"
-    $ index = 0
-    while index < len(inventar):
-        $ item = inventar[index]
-        "- [item]"
-        $ index += 1
-    menu:
-        "Essen (Snacks) verzehren (+30 Energie)" if "Essen (Snacks)" in inventar:
-            $ inventar.remove("Essen (Snacks)")
-            $ energie = min(energie + 30, max_energie)
-            "Du isst die Snacks und regenerierst Energie."
-            jump rucksack_ansehen
-        "Alkohol (Wodka) trinken (+50 Energie)" if "Alkohol (Wodka)" in inventar:
-            $ inventar.remove("Alkohol (Wodka)")
-            $ energie = min(energie + 50, max_energie)
-            "Du trinkst den Wodka. Dir wird heiß und deine Hemmungen sinken!"
-            jump rucksack_ansehen
-        "Zurück":
-            jump mein_zimmer
+    else:
+        "Im Rucksack befindet sich aktuell:"
+        $ index = 0
+        while index < len(inventar):
+            $ item = inventar[index]
+            "- [item]"
+            $ index += 1
+    jump mein_zimmer
 
 label mein_zimmer_schlafen:
-    $ energie = max_energie
+    $ energie = 100
     if tageszeit == "Morgen":
         $ tageszeit = "Nachmittag"
     elif tageszeit == "Nachmittag":
@@ -244,21 +241,25 @@ label mein_zimmer_schlafen:
     else:
         $ tageszeit = "Morgen"
         $ heute_gearbeitet = False
+        
         if sarah_korruption >= 25:
             $ sarah_tage_seit_sex += 1
         if krause_korruption >= 25:
             $ krause_tage_seit_sex += 1
-        if berg_korruption >= 25:
-            $ berg_tage_seit_sex += 1
-        if elena_korruption >= 25:
-            $ elena_tage_seit_sex += 1
+            
         $ aktueller_tag_index += 1
         if aktueller_tag_index > 6:
             $ aktueller_tag_index = 0
             $ miete_bezahlt = False
+            
     $ tag_name = wochentage[aktueller_tag_index]
     "Du hast geschlafen. Es ist jetzt [tag_name] ([tageszeit])."
     jump wohnheim_flur
+
+
+# =========================================================================
+# 6. ORT: APOTHEKE
+# =========================================================================
 
 label apotheke:
     "Du betrittst die Apotheke."
@@ -275,10 +276,17 @@ label apotheke:
         "Zurück":
             jump wohnheim_flur
 
+
+# =========================================================================
+# 7. ORT: SARAHS ZIMMER (INTERAKTION & ERWACHSENEN-MENÜ)
+# =========================================================================
+
 label sarahs_zimmer:
     "Du betrittst Sarahs Zimmer."
+    
     if sarah_test_verlangt and not sarah_test_bestanden:
         jump sarah_test_abgabe_label
+
     if tageszeit == "Nacht" and sarah_korruption < 10:
         s "Max? Es ist mitten in der Nacht! Geh bitte..."
         jump wohnheim_flur
@@ -286,7 +294,8 @@ label sarahs_zimmer:
         s "Max... Schön, dass du dich nachts zu mir schleichst..."
         if sarah_test_bestanden:
             jump sarah_schwanger_sex_menue
-        jump sarah_erwachsenen_menue
+        else:
+            jump sarah_erwachsenen_menue
     else:
         if sarah_test_bestanden:
             s "Oh Max! Unserem Baby geht es gut. Ich merke richtig, wie sich mein Körper verändert..."
@@ -409,7 +418,8 @@ label krause_buero:
         k "Ah, Max... Ich habe gehofft, dass du dich zu mir schleichst..."
         if krause_test_bestanden:
             jump krause_schwanger_sex_menue
-        jump krause_erwachsenen_menue
+        else:
+            jump krause_erwachsenen_menue
     else:
         if krause_test_bestanden:
             k "Guten Tag, Vater meines ungeborenen Kindes. Setzen Sie sich, Max."
@@ -855,14 +865,6 @@ label wochenend_markt:
         "Ein Parfüm für Sarah kaufen (-15$)" if geld >= 15 and "Parfüm" not in inventar:
             $ geld -= 15
             $ inventar.append("Parfüm")
-            jump wohnheim_flur
-        "Einen edlen Snackkorb kaufen (-15$)" if geld >= 15:
-            $ geld -= 15
-            $ inventar.append("Essen (Snacks)")
-            jump wohnheim_flur
-        "Hochwertigen Alkohol kaufen (-25$)" if geld >= 25:
-            $ geld -= 25
-            $ inventar.append("Alkohol (Wodka)")
             jump wohnheim_flur
         "Zurück":
             jump wohnheim_flur
