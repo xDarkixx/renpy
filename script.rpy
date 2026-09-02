@@ -915,3 +915,109 @@ label berg_test_abgabe_label:
 # =========================================================================
 # 13. WEITERE EVENTS
 # =========================================================================
+
+
+# =========================================================================
+# FEHLENDE INTEGRATIONS-LABELS AUS DER ERWEITERUNG
+# =========================================================================
+
+label handy_shop_menue:
+    "--- AMAZON & LIEFERDIENST ---"
+    menu:
+        "Fast-Food bestellen (-15$)" if geld >= 15:
+            $ geld -= 15
+            $ inventar.append("Essen (Snacks)")
+            "Du hast eine Pizza bestellt. Sie wurde diskret vor deine Zimmertür gelegt."
+            jump handy_shop_menue
+        "Flasche Wodka bestellen (-25$)" if geld >= 25:
+            $ geld -= 25
+            $ inventar.append("Alkohol (Wodka)")
+            "Du hast eine Flasche harten Alkohol im Express-Versand bestellt."
+            jump handy_shop_menue
+        "Zurück":
+            jump handy_menue
+
+label handy_sexshop_app:
+    "--- AMOR'S CHOICE (ADULT SHOP) ---"
+    menu:
+        "Vibrator / Intim-Spielzeug bestellen (-35$)" if geld >= 35:
+            $ geld -= 35
+            $ inventar.append("Intim-Spielzeug")
+            "Erfolgreich bestellt! Ein unauffälliges, neutral verpacktes Paket wird geliefert."
+            jump handy_sexshop_app
+        "Reizwäsche / Knappes Outfit bestellen (-50$)" if geld >= 50:
+            $ geld -= 50
+            $ inventar.append("Knappes Outfit")
+            "Erfolgreich bestellt! Ein diskretes Paket mit heißer Unterwäsche ist auf dem Weg."
+            jump handy_sexshop_app
+        "Zurück":
+            jump handy_menue
+
+label stadtpark:
+    "Du spazierst durch den grünen Stadtpark."
+    if tageszeit == "Nachmittag":
+        "Auf einer Parkbank im Schatten entdeckst du Elena. Ihr Kleid betont ihre gewaltigen Brüste (100F)."
+        if elena_test_bestanden:
+            jump elena_schwanger_sex_menue
+        elif elena_korruption >= 25:
+            jump elena_erwachsenen_menue
+        else:
+            el "Hallo! Ist hier noch frei?"
+            menu:
+                "Ihr Alkohol (Wodka) im Park anbieten" if "Alkohol (Wodka)" in inventar:
+                    $ inventar.remove("Alkohol (Wodka)")
+                    $ elena_korruption += 15
+                    el "Oh, Hochprozentiges im Park? Du gefällst mir... Lass uns hinter den Hecken trinken."
+                    jump stadtpark
+                "Dich zu ihr setzen und dich charmant unterhalten (-10 Energie)":
+                    $ energie -= 10
+                    $ elena_beziehung += 3
+                    jump wohnheim_flur
+                "Zurück zum Wohnheim":
+                    jump wohnheim_flur
+    else:
+        "Es ist zu spät."
+        jump wohnheim_flur
+
+label elena_erwachsenen_menue:
+    el "Max... hinter den großen Büschen dort drüben sieht uns absolut niemand. Kommst du mit?"
+    menu:
+        "Mit Elena hinter die Büsche gehen":
+            "Ihr versteckt euch im dichten Gebüsch. Du greifst ihre riesigen Brüste (100F) und knetest das weiche Fleisch."
+            "Du drückst sie gegen einen Baum und rammst deinen harten Schwanz tief in sie hinein."
+            menu:
+                "Tief in Elena abspritzen":
+                    $ elena_schwanger = True
+                    $ elena_tage_seit_sex = 0
+                    $ elena_korruption += 20
+                    jump mein_zimmer_schlafen
+        "Zurück":
+            jump stadtpark
+        "Zurück zum Wohnheim":
+            jump wohnheim_flur
+
+label elena_schwanger_sex_menue:
+    el "Max! Seit ich schwanger von dir bin, sind meine Brüste noch gewaltiger geworden. Nimm mich wieder hinter den Büschen!"
+    menu:
+        "Die schwangere Elena intensiv hinter den Büschen durchvögeln":
+            "Du nimmst sie mit ins Gebüsch, packst ihre prallen, schwangeren Zitzen und vögelst sie intensiv durch."
+            $ elena_korruption += 10
+            jump mein_zimmer_schlafen
+        "Gehen":
+            jump wohnheim_flur
+
+label elena_test_trigger_event:
+    $ elena_test_verlangt = True
+    el "Max, ich brauche einen Schwangerschaftstest, bring mir einen in den Park!"
+    jump wohnheim_flur
+
+label elena_test_abgabe_label:
+    el "Hast du den Test besorgt, Max?"
+    menu:
+        "Ihr den Test geben" if "Schwangerschaftstest" in inventar:
+            $ inventar.remove("Schwangerschaftstest")
+            "Der Test zeigt zwei deutliche Streifen: POSITIV."
+            $ elena_test_bestanden = True
+            jump wohnheim_flur
+        "Sagen, dass du noch keinen hast":
+            jump wohnheim_flur
