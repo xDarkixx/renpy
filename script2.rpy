@@ -1,4 +1,3 @@
-
 # =========================================================================
 # 1. CHARAKTERE DEFINIEREN
 # =========================================================================
@@ -6,6 +5,7 @@ define m = Character("Max", color="#c8ffc8")
 define s = Character("Sarah", color="#ffc8c8")
 define k = Character("Frau Krause", color="#e0aaff")
 define b = Character("Frau Berg", color="#ffaa66") 
+define el = Character("Elena", color="#ffaad4")
 define apo = Character("Apotheker", color="#aaffff")
 
 # Handy-Kontakte
@@ -38,6 +38,7 @@ default sarah_schwanger = False
 default sarah_tage_seit_sex = 0
 default sarah_test_verlangt = False
 default sarah_test_bestanden = False
+default sarah_traegt_outfit = False
 
 default krause_beziehung = 0
 default krause_korruption = 0
@@ -45,8 +46,8 @@ default krause_schwanger = False
 default krause_tage_seit_sex = 0
 default krause_test_verlangt = False
 default krause_test_bestanden = False
+default krause_traegt_outfit = False
 
-# Werte für die Lehrerin Frau Berg
 default berg_beziehung = 0
 default berg_korruption = 0
 default berg_schwanger = False
@@ -54,17 +55,27 @@ default berg_tage_seit_sex = 0
 default berg_test_verlangt = False
 default berg_test_bestanden = False
 
+default elena_beziehung = 0
+default elena_korruption = 0
+default elena_schwanger = False
+default elena_tage_seit_sex = 0
+default elena_test_verlangt = False
+default elena_test_bestanden = False
+
 # Story-Flags
 default miete_bezahlt = False
 default sarah_event_erledigt = False
-
-# Handy-System
 default neue_nachrichten_anzahl = 1
 
 
 # =========================================================================
 # 3. SPIELSTART
 # =========================================================================
+init python:
+    # Hilfsfunktion zum Prüfen von Gegenständen
+    def hat_item(item_name):
+        return item_name in store.inventar
+
 label start:
     m "Ein neues Semester im Wohnheim beginnt. Mal sehen, wohin das alles führt."
     jump wohnheim_flur
@@ -87,8 +98,11 @@ label wohnheim_flur:
     if krause_schwanger and krause_tage_seit_sex >= 3 and not krause_test_verlangt:
         jump krause_test_trigger_event
 
-    if berg_schwanger and berg_tage_seit_sex >= 3 and not berg_test_verlangt:
+    if berg_schwanger and berg_tage_seit_sex >= 3 and not berg_test_trigger_event:
         jump berg_test_trigger_event
+
+    if elena_schwanger and elena_tage_seit_sex >= 3 and not elena_test_verlangt:
+        jump elena_test_trigger_event
 
     # ZUFÄLLIGES BETTEL-EVENT (Triggert nachts auf dem Flur, wenn Korruption sehr hoch ist)
     if tageszeit == "Nacht" and sarah_korruption >= 35 and renpy.random.randint(1, 100) <= 30:
@@ -99,9 +113,10 @@ label wohnheim_flur:
 
     "Status: [tag_name] ([tageszeit]) | Geld: [geld]$ | Energie: [energie]/[max_energie]"
     "Mädels-Status:"
-    "Sarah - Korruption: [sarah_korruption] | Schwanger: [sarah_schwanger]"
-    "Frau Krause - Korruption: [krause_korruption] | Schwanger: [krause_schwanger]"
-    "Frau Berg (Lehrerin) - Korruption: [berg_korruption] | Schwanger: [berg_schwanger]"
+    "Sarah - Korruption: [sarah_korruption] | Outfit aktiv: [sarah_traegt_outfit]"
+    "Frau Krause - Korruption: [krause_korruption] | Outfit aktiv: [krause_traegt_outfit]"
+    "Frau Berg (Lehrerin) - Korruption: [berg_korruption]"
+    "Elena (Park) - Korruption: [elena_korruption]"
     
     if energie <= 0:
         "Du bist völlig erschöpft! Du musst dich in deinem Zimmer ausruhen."
@@ -127,8 +142,11 @@ label wohnheim_flur:
         "In das Büro der Vermieterin":
             jump krause_buero
             
-        "Zur Universität gehen (Frau Berg)" if tageszeit == "Morgen" or tageszeit == "Nachmittag":
+        "Zur Universität gehen" if tageszeit == "Morgen" or tageszeit == "Nachmittag":
             jump universitaet
+            
+        "Zum Stadtpark gehen (Elena)" if tageszeit == "Nachmittag" or tageszeit == "Abend":
+            jump stadtpark
             
         "Zum Sportstudio gehen" if tageszeit == "Nachmittag" or tageszeit == "Abend":
             jump sportstudio
@@ -147,7 +165,7 @@ label wohnheim_flur:
 
 
 # =========================================================================
-# 5. ORT: MEIN ZIMMER, SCHLAFEN & HANDY
+# 5. ORT: MEIN ZIMMER, SCHLAFEN & HANDY-APPS
 # =========================================================================
 label mein_zimmer:
     "Du bist in deinem Zimmer."
@@ -161,7 +179,7 @@ label mein_zimmer:
         "[handy_button_text]":
             jump handy_menue
             
-        "In den Rucksack schauen (Inventar)":
+        "In den Rucksack schauen (Inventar & Items benutzen)":
             jump rucksack_ansehen
         
         "Im Bett schlafen (Energie aufladen & Zeit voranschreiten lassen)":
@@ -173,50 +191,78 @@ label mein_zimmer:
 label handy_menue:
     "--- SMARTPHONE ---"
     menu:
-        "Posteingang lesen" if neue_nachrichten_anzahl > 0:
-            $ neue_nachrichten_anzahl = 0
-            s_handy "Hey Max! Komm heute mal in mein Zimmer, wenn du Zeit hast."
+        "Spionage-App (Werte & Maße)":
+            "--- BIOMETRISCHE DATENBANK ---"
+            "Sarah - Korruption: [sarah_korruption] | Oberweite: 85C"
+            "Frau Krause - Korruption: [krause_korruption] | Oberweite: 95E"
+            "Frau Berg (Lehrerin) - Korruption: [berg_korruption] | Oberweite: 90D"
+            "Elena (Park) - Korruption: [elena_korruption] | Oberweite: 100F"
             jump handy_menue
             
-        "Werte der Bewohnerinnen auslesen (Spionage-App)":
-            "--- DATENBANK ---"
-            "Sarah - Zuneigung: [sarah_beziehung] | Korruption: [sarah_korruption]"
-            "Frau Krause - Zuneigung: [krause_beziehung] | Korruption: [krause_korruption]"
-            "Frau Berg - Zuneigung: [berg_beziehung] | Korruption: [berg_korruption]"
-            jump handy_menue
+        "SMS-Messenger":
+            jump handy_sms_menue
             
-        "Sarah eine SMS schreiben" if neue_nachrichten_anzahl == 0:
-            jump handy_sarah_chat
+        "Online-Shop (Lieferdienst)":
+            jump handy_shop_menue
             
-        "Frau Krause eine SMS schreiben" if krause_korruption >= 5:
-            jump handy_krause_chat
+        "Amor's Choice (Sex-Shop App)":
+            jump handy_sexshop_app
             
         "Handy weglegen":
             jump mein_zimmer
 
-label handy_sarah_chat:
+label handy_sms_menue:
     menu:
-        "Ein Kompliment senden" if sarah_korruption >= 5:
-            m "Du hast heute wirklich toll ausgesehen."
-            s_handy "Danke, Max... Das ist lieb von dir. Komm mich mal besuchen."
-            $ sarah_korruption += 2
-            jump handy_menue
+        "Sarah schreiben":
+            m "Hey Sarah, was machst du gerade?"
+            s_handy "Hey Max! Bin in meinem Zimmer... komm doch einfach rüber."
+            jump handy_sms_menue
+        "Frau Krause schreiben":
+            m "Guten Abend Frau Krause, alles ruhig im Wohnheim?"
+            k_handy "Herr Max, kümmern Sie sich um Ihr Studium! Aber nett, dass Sie fragen."
+            jump handy_sms_menue
         "Zurück":
             jump handy_menue
 
-label handy_krause_chat:
+label handy_shop_menue:
+    "--- AMAZON & LIEFERDIENST ---"
     menu:
-        "Ihr eine charmante Nachricht schicken":
-            m "Ich muss an unser interessantes Gespräch in Ihrem Büro denken..."
-            k_handy "Herr Max, Sie sollten sich auf Ihr Studium konzentrieren! Aber Sie sind sehr aufmerksam. Besuchen Sie mich ruhig wieder."
-            $ krause_korruption += 2
+        "Fast-Food bestellen (-15$)" if geld >= 15:
+            $ geld -= 15
+            $ inventar.append("Essen (Snacks)")
+            "Du hast eine Pizza bestellt. Sie wurde diskret vor deine Zimmertür gelegt."
+            jump handy_shop_menue
+        "Flasche Wodka bestellen (-25$)" if geld >= 25:
+            $ geld -= 25
+            $ inventar.append("Alkohol (Wodka)")
+            "Du hast eine Flasche harten Alkohol im Express-Versand bestellt."
+            jump handy_shop_menue
+        "Zurück":
             jump handy_menue
+
+# --- NEU: SEX-SHOP APP FÜR SPIELZEUG & OUTFITS ---
+label handy_sexshop_app:
+    "--- AMOR'S CHOICE (ADULT SHOP) ---"
+    menu:
+        "Vibrator / Intim-Spielzeug bestellen (-35$)" if geld >= 35:
+            $ geld -= 35
+            $ inventar.append("Intim-Spielzeug")
+            "Erfolgreich bestellt! Ein unauffälliges, neutral verpacktes Paket wird geliefert."
+            jump handy_sexshop_app
+            
+        "Reizwäsche / Knappes Outfit bestellen (-50$)" if geld >= 50:
+            $ geld -= 50
+            $ inventar.append("Knappes Outfit")
+            "Erfolgreich bestellt! Ein diskretes Paket mit heißer Unterwäsche ist auf dem Weg."
+            jump handy_sexshop_app
+            
         "Zurück":
             jump handy_menue
 
 label rucksack_ansehen:
     if not inventar:
         "Dein Rucksack ist komplett leer."
+        jump mein_zimmer
     else:
         "Im Rucksack befindet sich aktuell:"
         $ index = 0
@@ -224,64 +270,8 @@ label rucksack_ansehen:
             $ item = inventar[index]
             "- [item]"
             $ index += 1
-    jump mein_zimmer
-
-label mein_zimmer_schlafen:
-    $ energie = max_energie
-    if tageszeit == "Morgen":
-        $ tageszeit = "Nachmittag"
-    elif tageszeit == "Nachmittag":
-        $ tageszeit = "Abend"
-    elif tageszeit == "Abend":
-        $ tageszeit = "Nacht"
-    else:
-        $ tageszeit = "Morgen"
-        $ heute_gearbeitet = False
-        
-        if sarah_korruption >= 25:
-            $ sarah_tage_seit_sex += 1
-        if krause_korruption >= 25:
-            $ krause_tage_seit_sex += 1
-        if berg_korruption >= 25:
-            $ berg_tage_seit_sex += 1
             
-        $ aktueller_tag_index += 1
-        if aktueller_tag_index > 6:
-            $ aktueller_tag_index = 0
-            $ miete_bezahlt = False
-            
-    $ tag_name = wochentage[aktueller_tag_index]
-    "Du hast geschlafen. Es ist jetzt [tag_name] ([tageszeit])."
-    jump wohnheim_flur
-
-
-# =========================================================================
-# 6. ORT: APOTHEKE
-# =========================================================================
-label apotheke:
-    "Du betrittst die Apotheke."
-    apo "Wie kann ich Ihnen helfen?"
-    menu:
-        "Einen Schwangerschaftstest kaufen (-25$)" if geld >= 25:
-            $ geld -= 25
-            $ inventar.append("Schwangerschaftstest")
-            jump wohnheim_flur
-        "Die Pille danach kaufen (-40$)" if geld >= 40:
-            $ geld -= 40
-            $ inventar.append("Pille danach")
-            jump wohnheim_flur
-        "Zurück":
-            jump wohnheim_flur
-
-
-# =========================================================================
-# 7. ORT: SARAHS ZIMMER
-# =========================================================================
-label sarahs_zimmer:
-    "Du betrittst Sarahs Zimmer."
-    
-    if sarah_test_verlangt and not sarah_test_bestanden:
-        jump sarah_test_abgabe_label
-
-
-    jump sarah_zimmer_erweitert
+        menu:
+            "Essen (Snacks) verzehren (+30 Energie)" if "Essen (Snacks)" in inventar:
+                $ inventar.remove("Essen (Snacks)")
+                $ energie = min(energie + 30, max_energie)
