@@ -87,7 +87,7 @@ label wohnheim_flur:
     if krause_schwanger and krause_tage_seit_sex >= 3 and not krause_test_verlangt:
         jump krause_test_trigger_event
 
-    if berg_schwanger and berg_tage_seit_sex >= 3 and not berg_test_trigger_event:
+    if berg_schwanger and berg_tage_seit_sex >= 3 and not berg_test_verlangt:
         jump berg_test_trigger_event
 
     # ZUFÄLLIGES BETTEL-EVENT (Triggert nachts auf dem Flur, wenn Korruption sehr hoch ist)
@@ -283,3 +283,5 @@ label sarahs_zimmer:
     if sarah_test_verlangt and not sarah_test_bestanden:
         jump sarah_test_abgabe_label
 
+
+    jump sarah_zimmer_erweitert
