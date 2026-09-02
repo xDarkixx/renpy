@@ -83,7 +83,7 @@ screen say(who, what):
                 textbutton "Weiter":
                     style "say_button"
                     xalign 1.0
-                    action Continue()
+                    action Dismiss()
 
     # Weiter per Enter/Leertaste/Escape entsprechend Ren'Py-Dismiss.
     key "dismiss" action Continue()
@@ -107,10 +107,15 @@ screen choice(items):
             style "choice_vbox"
 
             for item in items:
-                textbutton item.caption:
-                    style "choice_button"
-                    text_style "choice_button_text"
-                    action item.action
+                if item.action:
+                    textbutton item.caption:
+                        style "choice_button"
+                        text_style "choice_button_text"
+                        action item.action
+                else:
+                    text item.caption:
+                        style "choice_button_text"
+                        xfill True
 
 # ============================================================
 # STATISTIK-HUD
