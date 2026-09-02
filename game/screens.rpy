@@ -71,6 +71,10 @@ style matrix_say_text:
 
 screen say(who, what):
     zorder 100
+
+    if who and matrix_character_for(who):
+        add expression matrix_character_for(who) at matrix_character_sprite
+
     window:
         id "window"
         style "matrix_say_window"
