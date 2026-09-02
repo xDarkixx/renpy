@@ -7,9 +7,6 @@ init python:
     if "stats_hud" not in config.overlay_screens:
         config.overlay_screens.append("stats_hud")
 
-# ------------------------------------------------------------
-# GUI-Stile
-# ------------------------------------------------------------
 style hud_frame:
     background Solid("#171b22")
     padding (18, 14)
@@ -51,11 +48,11 @@ style choice_button_text:
     xalign 0.5
     text_align 0.5
 
-# ------------------------------------------------------------
-# Dialog-GUI
-# Der Parameter 'what' ist der originale Ren'Py-Text.
-# Es wird nur die Darstellung geändert.
-# ------------------------------------------------------------
+# ============================================================
+# DIALOG-GUI
+# 'what' enthält den bereits vorhandenen Originaltext.
+# Die GUI verändert weder Storytext noch Variablen/Jumps.
+# ============================================================
 screen say(who, what):
     zorder 100
 
@@ -70,7 +67,7 @@ screen say(who, what):
         vbox:
             spacing 10
 
-            if who is not None:
+            if who:
                 text who:
                     id "who"
                     style "say_name"
@@ -82,18 +79,19 @@ screen say(who, what):
 
             hbox:
                 xfill True
-
                 null width 1
-
                 textbutton "Weiter":
                     style "say_button"
                     xalign 1.0
                     action Continue()
 
-# ------------------------------------------------------------
-# Eigene Darstellung der normalen Auswahlmenüs.
-# Die vorhandenen Choice-Texte werden unverändert übernommen.
-# ------------------------------------------------------------
+    # Weiter per Enter/Leertaste/Escape entsprechend Ren'Py-Dismiss.
+    key "dismiss" action Continue()
+
+# ============================================================
+# AUSWAHLMENÜS
+# Bestehende Choice-Texte werden direkt angezeigt.
+# ============================================================
 screen choice(items):
     zorder 110
 
@@ -114,9 +112,9 @@ screen choice(items):
                     text_style "choice_button_text"
                     action item.action
 
-# ------------------------------------------------------------
-# Statistik-HUD
-# ------------------------------------------------------------
+# ============================================================
+# STATISTIK-HUD
+# ============================================================
 screen stats_hud():
     zorder 90
 
@@ -136,14 +134,13 @@ screen stats_hud():
             null height 5
             text "Sarah: [sarah_beziehung]" size 17
             text "Krause: [krause_beziehung]" size 17
-
             textbutton "Spielstatistik":
                 xalign 0.5
                 action Show("game_stats")
 
-# ------------------------------------------------------------
-# Spielstatistik
-# ------------------------------------------------------------
+# ============================================================
+# SPIELSTATISTIK
+# ============================================================
 screen game_stats():
     zorder 200
     modal True
