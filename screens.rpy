@@ -72,8 +72,8 @@ screen say(who, what):
             textbutton "Weiter":
                 style "matrix_button"
                 xalign 1.0
-                action Dismiss()
-    key "dismiss" action Continue()
+                action Return()
+    key "dismiss" action Return()
 
 screen choice(items):
     zorder 110
