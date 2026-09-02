@@ -284,7 +284,7 @@ label sarah_erwachsenen_menue:
     menu:
         "Ihr Top ausziehen und an den Brüsten saugen" if sarah_korruption >= 12:
             jump sarah_ausziehen_szene
-"Einen tiefen Blowjob fordern" if sarah_korruption >= 20:
+        "Einen tiefen Blowjob fordern" if sarah_korruption >= 20:
             jump sarah_blowjob_szene
         "Die Kleidung komplett ablegen und schmutzig ficken" if sarah_korruption >= 25:
             jump sarah_vollsex_szene
@@ -430,12 +430,53 @@ label krause_erwachsenen_menue:
                     $ krause_korruption += 5
                     $ energie -= 20
                     jump mein_zimmer_schlafen
+        "Die reife Vermieterin schmutzig auf dem Schreibtisch flachlegen" if krause_korruption >= 25:
+            "Du hebst die nackte Vermieterin auf den großen Holzschreibtisch und saugst noch einmal fest an ihren Brüsten."
+            "Du breitest ihre Beine weit aus, packst deinen Schwanz und rammst ihn mit einem tiefen Stoß in ihre feuchte Fotze rein."
+            "Du ziehst ihn fast ganz heraus, sodass sie aufstöhnt, und schiebst ihn direkt wieder mit voller Wucht hinein."
+            k "Ahhh! Verdammt ja, ficke mich härter, Max! Ramm ihn tief in meine Gebärmutter, ficke die alte Vermieterin ordentlich durch!"
+            "Der Schreibtisch wackelt heftig, während du die reife Vermieterin unbarmherzig in ihrer nassen Spalte durchvögelst."
+            menu:
+                "Rausziehen und auf ihren Hintern abspritzen":
+                    "Kurz vor dem Spritzen ziehst du ihn heraus und feuerst dein Sperma in dicken Ladungen auf ihren reifen Arsch."
+                    k "Puh, du bist ein echtes Tier, Max. Schau dir mein ganzes Büro an..."
+                    $ krause_korruption += 10
+                    $ energie -= 40
+                    jump mein_zimmer_schlafen
+                "In der Vermieterin abspritzen (Sperma in die Fotze pumpen!)":
+                    k "Zieh nicht raus! Spritz in mir ab! Mach mich schwanger, Max! Drück dein ganzes Sperma tief in meine Gebärmutter!"
+                    "Du bleibst ganz tief in ihr drin und pumpst deine heiße Ladung Sperma komplett in ihr Inneres."
+                    k "Ahhh! Oh Gott, jaaa! Pump mich voll! Mach die Vermieterin schwanger! Lass mich deine Brut austragen!"
+                    "Das weiße Sperma läuft ihr langsam aus ihrer gedehnten Fotze auf die Schreibtischplatte."
+                    $ krause_schwanger = True
+                    $ krause_tage_seit_sex = 0
+                    $ krause_korruption += 25
+                    $ energie -= 45
+                    jump mein_zimmer_schlafen
+        "Ihren reifen Arsch nehmen (Anal)" if krause_korruption >= 35:
+            "Du beugst Frau Krause weit über ihren Schreibtisch, sodass ihre Dokumente fliegen."
+            "Du nimmst deinen Schwanz, spuckst darauf und drückst ihn mit einem Ruck trocken in ihre Rosette hinein."
+            k "Ahhh! Oh mein Gott, Max! Das ist so enge! Du vögelst mich in den Arsch! Ja, ficke meinen reifen Arsch!"
+            "Du hämmerst wie wild von hinten in sie rein, ziehst den Riemen raus und schiebst ihn direkt wieder tief in ihren Anus."
+            "Am Höhepunkt spritzt du deine ganze Ladung heftig auf ihren Rücken und ihren Hintern."
+            $ krause_korruption += 20
+            $ energie -= 45
+            jump mein_zimmer_schlafen
         "Das Büro verlassen":
             jump wohnheim_flur
 
 label krause_schwanger_sex_menue:
-    k "Max... Wer hätte gedacht, dass ich von meinem eigenen Mieter schwanger werde?"
+    k "Max... Wer hätte gedacht, dass ich von meinem eigenen Mieter schwanger werde? Mein Körper verlangt jetzt erst recht nach deinem harten Schwanz. Nimm mich auf meinem Schreibtisch!"
     menu:
+        "Die schwangere Vermieterin wild auf dem Schreibtisch flachlegen":
+            "Du schließt die Bürotür ab und ziehst sie komplett nackt aus."
+            "Du packst ihre Zitzen, saugst gierig daran und schiebst deinen Schwanz mit einem Ruck tief in ihre schwangere, nasse Fotze."
+            "Das nasse Rein- und Rausschieben hallt durch das Büro. Du nimmst sie hart ran."
+            k "Ahhh Max, ja! Ficke deine schwangere Vermieterin! Ramm ihn tief bis an die Gebärmutter! Befruchte mich einfach nochmal!"
+            "Du kommst an deine Grenze und spritzt dein ganzes Sperma kochend heiß tief in ihre schwangere Spalte rein."
+            $ krause_korruption += 10
+            $ energie -= 45
+            jump mein_zimmer_schlafen
         "Das Büro verlassen":
             jump wohnheim_flur
 
@@ -459,17 +500,19 @@ label gemeinschaftsdusche:
         jump wohnheim_flur
 
 label dusche_sarah_event:
-    "Du öffnest den Vorhang. Sarah steht nackt unter dem warmen Wasser."
+    "Du öffnest den Vorhang. Sarah steht nackt unter dem warmen Wasser. Das Wasser läuft über ihre prallen Brüste."
     s "Max! Oh... komm rein zu mir..."
     menu:
         "Sie nackt an die Fliesen drücken und ficken":
-            "Du ziehst deine Sachen aus und drückst Sarah mit dem Gesicht an die nassen Fliesen."
+            "Du ziehst deine Sachen aus, drückst Sarah mit dem Gesicht an die nassen Fliesen, saugst an ihrem Hals und schiebst deinen harten Schwanz von hinten tief in ihre nasse Fotze hinein."
+            "Das Wasser spritzt, während du sie im Stehen durchvögelst – immer wieder tief rein und raus."
             if sarah_test_bestanden:
-                s "Ahhh, Max! Ja! Deine schwangere Mitbewohnerin will dich."
+                s "Ahhh, Max! Ja, ficke deine schwangere Mitbewohnerin unter der Dusche! Ramm ihn ganz tief rein!"
             else:
-                s "Ahhh, Max! Ja! Komm näher."
+                s "Ahhh, Max! Ja, ficke mich unter der Dusche! Ramm ihn tief in meine Gebärmutter, mach mich schwanger im nassen Wasser!"
             $ sarah_schwanger = True
             $ sarah_tage_seit_sex = 0
+            "Du hältst sie fest und spritzt deine Ladung Sperma voll in ihr Inneres."
             $ sarah_korruption += 15
             $ energie -= 40
             jump mein_zimmer_schlafen
@@ -477,17 +520,19 @@ label dusche_sarah_event:
             jump wohnheim_flur
 
 label dusche_krause_event:
-    "Du hörst Wasser laufen. Frau Krause steht in der Kabine und wäscht ihren Körper."
-    k "Herr Max? Oh... Schauen Sie nicht so..."
+    "Du hörst Wasser laufen. Frau Krause steht komplett nackt in der Kabine und wäscht ihren reifen Körper."
+    k "Herr Max? Oh... Schauen Sie nicht so... Oder kommen Sie lieber her?"
     menu:
         "Die Vermieterin unter der Dusche nehmen":
-            "Du steigst zu ihr in die Kabine. Die Szene endet mit einer gemeinsamen, einvernehmlichen Begegnung."
+            "Du steigst nackt zu ihr in die Kabine. Du drehst sie um, packst ihre schweren Brüste von hinten, saugst an ihren Schultern und rammst deinen harten Schwanz tief in sie hinein."
+            "Du bewegst deine Hüften wild und schiebst ihn unbarmherzig rein und raus, während das Wasser auf euch niederprallt."
             if krause_test_bestanden:
-                k "Max, Sie sind wirklich ungezogen."
+                k "Ahhh! Max, ja! Ficke mich schwanger gegen die Wand! Saug an meinen nassen Titten!"
             else:
-                k "Max, Sie bringen mich noch um den Verstand."
+                k "Ahhh! Max, du ungezogenes Tier! Ficke mich härter gegen die Wand! Spritz mich voll, mach mich schwanger unter der Dusche!"
             $ krause_schwanger = True
             $ krause_tage_seit_sex = 0
+            "Am Ende feuerst du dein ganzes Sperma kochend heiß tief in ihre Fotze rein."
             $ krause_korruption += 15
             $ energie -= 40
             jump mein_zimmer_schlafen
@@ -508,13 +553,13 @@ label arbeiten:
     jump wohnheim_flur
 
 label sarah_bettelt_event:
-    "Du bist nachts auf dem Flur. Plötzlich öffnet sich Sarahs Tür."
+    "Du bist nachts auf dem Flur. Plötzlich öffnet sich Sarahs Tür. Sie trägt nur ein kurzes Top, ihre nackten Titten schimmern durch."
     if sarah_test_bestanden:
-        s "Max... Bitte komm rein zu mir."
+        s "Max... dein Baby in mir macht mich so verdammt heiß... Bitte komm rein und nimm meine schwangere Fotschema hart ran!"
     else:
-        s "Max... Ich kann nicht schlafen. Komm bitte rein."
+        s "Max... ich kann nicht schlafen. Meine Muschi ist so heiß und nass... Bitte komm rein und ficke mich! Ich bettle dich an, nimm mich hart und mach mich schwanger!"
     menu:
-        "Ihr Flehen erhören":
+        "Ihr Flehen erhören und sie im Bett durchvögeln":
             if sarah_test_bestanden:
                 jump sarah_schwanger_sex_menue
             else:
@@ -524,13 +569,18 @@ label sarah_bettelt_event:
             jump wohnheim_flur
 
 label krause_bettelt_event:
-    "Frau Krause kommt nachts die Treppe herunter."
+    "Frau Krause kommt nachts im transparenten Morgenmantel die Treppe herunter."
     if krause_test_bestanden:
-        k "Max... Ich brauche dich bei mir."
+        k "Max... Ich brauche deinen Schwanz in meinem schwangeren Körper! Ficke mich direkt hier auf dem Boden!"
     else:
-        k "Max... Ich halte es in meinem Bett nicht mehr aus."
+        k "Max... Ich halte es in meinem Bett nicht mehr aus. Ich brauche deinen harten Schwanz! Ficke die alte Vermieterin, ramm ihn tief rein und mach mich schwanger, ich flehe dich an!"
     menu:
-        "Die Vermieterin begleiten":
+        "Die Vermieterin auf dem Flurboden flachlegen":
+            "Du reißt ihren Mantel auf, saugst wild an ihren Brüsten und rammst deinen Schwanz direkt auf dem Boden tief in sie hinein."
+            if krause_test_bestanden:
+                k "Ahhh! Ja, ficke deinen ungeborenen Nachwuchs direkt auf dem Flur!"
+            else:
+                k "Ahhh! Ja, ficke mich wie eine Läufige direkt auf dem Flur! Spritz mich voll!"
             $ krause_schwanger = True
             $ krause_tage_seit_sex = 0
             $ krause_korruption += 10
@@ -549,7 +599,7 @@ label sarah_test_abgabe_label:
         "Ihr den Test geben" if "Schwangerschaftstest" in inventar:
             $ inventar.remove("Schwangerschaftstest")
             "Der Test zeigt zwei deutliche Streifen: POSITIV."
-            s "Oh mein Gott, Max... Es hat wirklich geklappt! Ich bekomme dein Kind!"
+            s "Oh mein Gott, Max... Es hat wirklich geklappt! Du hast mich schwanger gefickt! Ich bekomme dein Kind!"
             $ sarah_test_bestanden = True
             jump wohnheim_flur
         "Sagen, dass du noch keinen hast":
@@ -566,7 +616,7 @@ label krause_test_abgabe_label:
         "Ihr den Test geben" if "Schwangerschaftstest" in inventar:
             $ inventar.remove("Schwangerschaftstest")
             "Der Test ist glasklar POSITIV."
-            k "Ich fass es nicht... Ich bin schwanger von meinem Studenten!"
+            k "Ich fass es nicht... Ich bin schwanger von meinem Studenten! Du hast mich geschwängert, Max! Ich trage deine Brut in mir!"
             $ krause_test_bestanden = True
             jump wohnheim_flur
         "Sagen, dass du noch keinen hast":
