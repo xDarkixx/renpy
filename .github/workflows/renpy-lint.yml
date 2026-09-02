@@ -1,0 +1,27 @@
+name: Ren'Py Lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y bzip2 libgl1 libglib2.0-0 libgtk2.0-0 libnss3
+
+      - name: Download Ren'Py 8.5.3
+        run: curl -L --fail --retry 3 -o renpy-sdk.tar.bz2 https://www.renpy.org/dl/release/renpy-8.5.3-sdk.tar.bz2
+
+      - name: Extract Ren'Py SDK
+        run: tar -xjf renpy-sdk.tar.bz2
+
+      - name: Run Ren'Py Lint
+        run: ./renpy-8.5.3-sdk/renpy.sh "$GITHUB_WORKSPACE" lint --error-code
