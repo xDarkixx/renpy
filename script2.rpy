@@ -1,33 +1,39 @@
 # =========================================================================
-# MERGED / FIXED SCRIPT2
+# 1. CHARAKTERE DEFINIEREN
 # =========================================================================
 define m = Character("Max", color="#c8ffc8")
 define s = Character("Sarah", color="#ffc8c8")
 define k = Character("Frau Krause", color="#e0aaff")
-define b = Character("Frau Berg", color="#ffaa66")
-define el = Character("Elena", color="#ffaad4")
 define apo = Character("Apotheker", color="#aaffff")
 
+# Handy-Kontakte
 define s_handy = Character("Sarah (SMS)", color="#ffffc8")
 define k_handy = Character("Frau Krause (SMS)", color="#f0c8ff")
-define b_handy = Character("Frau Berg (SMS)", color="#ffd8aa")
 
+# =========================================================================
+# 2. STATISTIKEN, INVENTAR UND SYSTEM-VARIABLEN
+# =========================================================================
 default geld = 20
 default energie = 100
-default max_energie = 100
-default tageszeit = "Morgen"
+default tageszeit = "Morgen" # Morgen, Nachmittag, Abend, Nacht
+
+# Wochentage-System
 default wochentage = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
-default aktueller_tag_index = 0
+default aktueller_tag_index = 0 
+
+# Arbeitssperre
 default heute_gearbeitet = False
+
+# Inventar-System
 default inventar = []
 
+# --- CHARAKTER-WERTE (ZUNEIGUNG, KORRUPTION & STATUS) ---
 default sarah_beziehung = 0
 default sarah_korruption = 0
 default sarah_schwanger = False
 default sarah_tage_seit_sex = 0
 default sarah_test_verlangt = False
 default sarah_test_bestanden = False
-default sarah_traegt_outfit = False
 
 default krause_beziehung = 0
 default krause_korruption = 0
@@ -35,30 +41,18 @@ default krause_schwanger = False
 default krause_tage_seit_sex = 0
 default krause_test_verlangt = False
 default krause_test_bestanden = False
-default krause_traegt_outfit = False
 
-default berg_beziehung = 0
-default berg_korruption = 0
-default berg_schwanger = False
-default berg_tage_seit_sex = 0
-default berg_test_verlangt = False
-default berg_test_bestanden = False
-
-default elena_beziehung = 0
-default elena_korruption = 0
-default elena_schwanger = False
-default elena_tage_seit_sex = 0
-default elena_test_verlangt = False
-default elena_test_bestanden = False
-
+# Story-Flags
 default miete_bezahlt = False
 default sarah_event_erledigt = False
+
+# Handy-System
 default neue_nachrichten_anzahl = 1
 
-init python:
-    def hat_item(item_name):
-        return item_name in store.inventar
 
+# =========================================================================
+# 3. SPIELSTART
+# =========================================================================
 label start:
     m "Ein neues Semester im Wohnheim beginnt. Mal sehen, wohin das alles führt."
     jump wohnheim_flur
@@ -67,7 +61,6 @@ label start:
 # =========================================================================
 # 4. HAUPT-HUB (ORTSAUSWAHL)
 # =========================================================================
-
 label wohnheim_flur:
     $ tag_name = wochentage[aktueller_tag_index]
     
@@ -127,6 +120,13 @@ label wohnheim_flur:
         "Zum Samstags-Markt gehen" if tag_name == "Samstag" or tag_name == "Sonntag":
             jump wochenend_markt
             
+        "Zur Universität gehen":
+            jump universitaet
+        "Zum Stadtpark gehen":
+            jump stadtpark
+        "Zum Sportstudio gehen":
+            jump sportstudio
+            
         "Arbeiten gehen (+50$, kostet 40 Energie)" if tageszeit != "Nacht" and not heute_gearbeitet:
             jump arbeiten
 
@@ -134,7 +134,6 @@ label wohnheim_flur:
 # =========================================================================
 # 5. ORT: MEIN ZIMMER, SCHLAFEN & HANDY
 # =========================================================================
-
 label mein_zimmer:
     "Du bist in deinem Zimmer."
     
@@ -173,48 +172,23 @@ label handy_menue:
         "Handy weglegen":
             jump mein_zimmer
 
-label handy_sms_menue:
+label handy_sarah_chat:
     menu:
-        "Sarah schreiben":
-            m "Hey Sarah, was machst du gerade?"
-            s_handy "Hey Max! Bin in meinem Zimmer... komm doch einfach rüber."
-            jump handy_sms_menue
-        "Frau Krause schreiben":
-            m "Guten Abend Frau Krause, alles ruhig im Wohnheim?"
-            k_handy "Herr Max, kümmern Sie sich um Ihr Studium! Aber nett, dass Sie fragen."
-            jump handy_sms_menue
+        "Ein Kompliment senden" if sarah_korruption >= 5:
+            m "Du hast heute wirklich toll ausgesehen."
+            s_handy "Danke, Max... Das ist lieb von dir. Komm mich mal besuchen."
+            $ sarah_korruption += 2
+            jump handy_menue
         "Zurück":
             jump handy_menue
 
-label handy_shop_menue:
-    "--- AMAZON & LIEFERDIENST ---"
+label handy_krause_chat:
     menu:
-        "Fast-Food bestellen (-15$)" if geld >= 15:
-            $ geld -= 15
-            $ inventar.append("Essen (Snacks)")
-            "Du hast eine Pizza bestellt. Sie wurde diskret vor deine Zimmertür gelegt."
-            jump handy_shop_menue
-        "Flasche Wodka bestellen (-25$)" if geld >= 25:
-            $ geld -= 25
-            $ inventar.append("Alkohol (Wodka)")
-            "Du hast eine Flasche harten Alkohol im Express-Versand bestellt."
-            jump handy_shop_menue
-        "Zurück":
+        "Ihr eine charmante Nachricht schicken":
+            m "Ich muss an unser interessantes Gespräch in Ihrem Büro denken..."
+            k_handy "Herr Max, Sie sollten sich auf Ihr Studium konzentrieren! Aber Sie sind sehr aufmerksam. Besuchen Sie mich ruhig wieder."
+            $ krause_korruption += 2
             jump handy_menue
-
-label handy_sexshop_app:
-    "--- AMOR'S CHOICE (ADULT SHOP) ---"
-    menu:
-        "Vibrator / Intim-Spielzeug bestellen (-35$)" if geld >= 35:
-            $ geld -= 35
-            $ inventar.append("Intim-Spielzeug")
-            "Erfolgreich bestellt! Ein unauffälliges, neutral verpacktes Paket wird geliefert."
-            jump handy_sexshop_app
-        "Reizwäsche / Knappes Outfit bestellen (-50$)" if geld >= 50:
-            $ geld -= 50
-            $ inventar.append("Knappes Outfit")
-            "Erfolgreich bestellt! Ein diskretes Paket mit heißer Unterwäsche ist auf dem Weg."
-            jump handy_sexshop_app
         "Zurück":
             jump handy_menue
 
@@ -229,6 +203,20 @@ label rucksack_ansehen:
             "- [item]"
             $ index += 1
     jump mein_zimmer
+
+    menu:
+        "Essen (Snacks) essen" if "Essen (Snacks)" in inventar:
+            $ inventar.remove("Essen (Snacks)")
+            $ energie = min(energie + 25, max_energie)
+            "Du isst die Snacks und regenerierst Energie."
+            jump rucksack_ansehen
+        "Alkohol (Wodka) trinken (+50 Energie)" if "Alkohol (Wodka)" in inventar:
+            $ inventar.remove("Alkohol (Wodka)")
+            $ energie = min(energie + 50, max_energie)
+            "Du trinkst den Wodka. Dir wird heiß und deine Hemmungen sinken!"
+            jump rucksack_ansehen
+        "Zurück":
+            jump mein_zimmer
 
 label mein_zimmer_schlafen:
     $ energie = 100
@@ -260,7 +248,6 @@ label mein_zimmer_schlafen:
 # =========================================================================
 # 6. ORT: APOTHEKE
 # =========================================================================
-
 label apotheke:
     "Du betrittst die Apotheke."
     apo "Wie kann ich Ihnen helfen?"
@@ -280,7 +267,6 @@ label apotheke:
 # =========================================================================
 # 7. ORT: SARAHS ZIMMER (INTERAKTION & ERWACHSENEN-MENÜ)
 # =========================================================================
-
 label sarahs_zimmer:
     "Du betrittst Sarahs Zimmer."
     
@@ -515,6 +501,247 @@ label krause_schwanger_sex_menue:
         "Das Büro verlassen":
             jump wohnheim_flur
 
+label gemeinschaftsdusche:
+    "Du betrittst die feuchten Gemeinschaftsduschen des Wohnheims."
+    if tageszeit == "Nachmittag" or tageszeit == "Abend":
+        menu:
+            "Nachsehen, wer unter der Dusche steht":
+                $ wurf = renpy.random.randint(1, 2)
+                if wurf == 1 and sarah_korruption >= 20:
+                    jump dusche_sarah_event
+                elif wurf == 2 and krause_korruption >= 20:
+                    jump dusche_krause_event
+                else:
+                    "Die Duschen sind im Moment leer."
+                    jump wohnheim_flur
+            "Zurück":
+                jump wohnheim_flur
+    else:
+        "Es ist niemand in den Duschen."
+        jump wohnheim_flur
+
+label dusche_sarah_event:
+    "Du öffnest den Vorhang. Sarah steht nackt unter dem warmen Wasser. Das Wasser läuft über ihre prallen Brüste."
+    s "Max! Oh... komm rein zu mir..."
+    menu:
+        "Sie nackt an die Fliesen drücken und ficken":
+            "Du ziehst deine Sachen aus, drückst Sarah mit dem Gesicht an die nassen Fliesen, saugst an ihrem Hals und schiebst deinen harten Schwanz von hinten tief in ihre nasse Fotze hinein."
+            "Das Wasser spritzt, während du sie im Stehen durchvögelst – immer wieder tief rein und raus."
+            if sarah_test_bestanden:
+                s "Ahhh, Max! Ja, ficke deine schwangere Mitbewohnerin unter der Dusche! Ramm ihn ganz tief rein!"
+            else:
+                s "Ahhh, Max! Ja, ficke mich unter der Dusche! Ramm ihn tief in meine Gebärmutter, mach mich schwanger im nassen Wasser!"
+            $ sarah_schwanger = True
+            $ sarah_tage_seit_sex = 0
+            "Du hältst sie fest und spritzt deine Ladung Sperma voll in ihr Inneres."
+            $ sarah_korruption += 15
+            $ energie -= 40
+            jump mein_zimmer_schlafen
+        "Gehen":
+            jump wohnheim_flur
+
+label dusche_krause_event:
+    "Du hörst Wasser laufen. Frau Krause steht komplett nackt in der Kabine und wäscht ihren reifen Körper."
+    k "Herr Max? Oh... Schauen Sie nicht so... Oder kommen Sie lieber her?"
+    menu:
+        "Die Vermieterin unter der Dusche nehmen":
+            "Du steigst nackt zu ihr in die Kabine. Du drehst sie um, packst ihre schweren Brüste von hinten, saugst an ihren Schultern und rammst deinen harten Schwanz tief in sie hinein."
+            "Du bewegst deine Hüften wild und schiebst ihn unbarmherzig rein und raus, während das Wasser auf euch niederprallt."
+            if krause_test_bestanden:
+                k "Ahhh! Max, ja! Ficke mich schwanger gegen die Wand! Saug an meinen nassen Titten!"
+            else:
+                k "Ahhh! Max, du ungezogenes Tier! Ficke mich härter gegen die Wand! Spritz mich voll, mach mich schwanger unter der Dusche!"
+            $ krause_schwanger = True
+            $ krause_tage_seit_sex = 0
+            "Am Ende feuerst du dein ganzes Sperma kochend heiß tief in ihre Fotze rein."
+            $ krause_korruption += 15
+            $ energie -= 40
+            jump mein_zimmer_schlafen
+        "Gehen":
+            jump wohnheim_flur
+
+label arbeiten:
+    $ geld += 50
+    $ energie -= 40
+    $ heute_gearbeitet = True
+    "Du hast im Cafe gejobbt. +50$, -40 Energie."
+    if tageszeit == "Morgen":
+        $ tageszeit = "Nachmittag"
+    elif tageszeit == "Nachmittag":
+        $ tageszeit = "Abend"
+    else:
+        $ tageszeit = "Nacht"
+    jump wohnheim_flur
+
+label sarah_bettelt_event:
+    "Du bist nachts auf dem Flur. Plötzlich öffnet sich Sarahs Tür. Sie trägt nur ein kurzes Top, ihre nackten Titten schimmern durch."
+    if sarah_test_bestanden:
+        s "Max... dein Baby in mir macht mich so verdammt heiß... Bitte komm rein und nimm meine schwangere Fotschema hart ran!"
+    else:
+        s "Max... ich kann nicht schlafen. Meine Muschi ist so heiß und nass... Bitte komm rein und ficke mich! Ich bettle dich an, nimm mich hart und mach mich schwanger!"
+    menu:
+        "Ihr Flehen erhören und sie im Bett durchvögeln":
+            if sarah_test_bestanden:
+                jump sarah_schwanger_sex_menue
+            else:
+                jump sarah_vollsex_szene
+        "Sie ignorieren":
+            "Du lässt sie stehen. Sie jammert leise."
+            jump wohnheim_flur
+
+label krause_bettelt_event:
+    "Frau Krause kommt nachts im transparenten Morgenmantel die Treppe herunter."
+    if krause_test_bestanden:
+        k "Max... Ich brauche deinen Schwanz in meinem schwangeren Körper! Ficke mich direkt hier auf dem Boden!"
+    else:
+        k "Max... Ich halte es in meinem Bett nicht mehr aus. Ich brauche deinen harten Schwanz! Ficke die alte Vermieterin, ramm ihn tief rein und mach mich schwanger, ich flehe dich an!"
+    menu:
+        "Die Vermieterin auf dem Flurboden flachlegen":
+            "Du reißt ihren Mantel auf, saugst wild an ihren Brüsten und rammst deinen Schwanz direkt auf dem Boden tief in sie hinein."
+            if krause_test_bestanden:
+                k "Ahhh! Ja, ficke deinen ungeborenen Nachwuchs direkt auf dem Flur!"
+            else:
+                k "Ahhh! Ja, ficke mich wie eine Läufige direkt auf dem Flur! Spritz mich voll!"
+            $ krause_schwanger = True
+            $ krause_tage_seit_sex = 0
+            $ krause_korruption += 10
+            jump mein_zimmer_schlafen
+        "Sie wegschicken":
+            jump wohnheim_flur
+
+label sarah_test_trigger_event:
+    $ sarah_test_verlangt = True
+    s "Max... meine Tage sind überfällig und mir ist so schlecht. Bitte besorge mir sofort einen Schwangerschaftstest!"
+    jump wohnheim_flur
+
+label sarah_test_abgabe_label:
+    s "Hast du den Schwangerschaftstest, Max?"
+    menu:
+        "Ihr den Test geben" if "Schwangerschaftstest" in inventar:
+            $ inventar.remove("Schwangerschaftstest")
+            "Der Test zeigt zwei deutliche Streifen: POSITIV."
+            s "Oh mein Gott, Max... Es hat wirklich geklappt! Du hast mich schwanger gefickt! Ich bekomme dein Kind!"
+            $ sarah_test_bestanden = True
+            jump wohnheim_flur
+        "Sagen, dass du noch keinen hast":
+            jump wohnheim_flur
+
+label krause_test_trigger_event:
+    $ krause_test_verlangt = True
+    k "Max... wir haben ein Problem. Mir ist speiübel. Besorge mir unauffällig einen Schwangerschaftstest!"
+    jump wohnheim_flur
+
+label krause_test_abgabe_label:
+    k "Haben Sie den Test besorgt, Max?"
+    menu:
+        "Ihr den Test geben" if "Schwangerschaftstest" in inventar:
+            $ inventar.remove("Schwangerschaftstest")
+            "Der Test ist glasklar POSITIV."
+            k "Ich fass es nicht... Ich bin schwanger von meinem Studenten! Du hast mich geschwängert, Max! Ich trage deine Brut in mir!"
+            $ krause_test_bestanden = True
+            jump wohnheim_flur
+        "Sagen, dass du noch keinen hast":
+            jump wohnheim_flur
+
+label krause_miete_event:
+    k "Max! Es ist Sonntagabend. Ich brauche die wöchentliche Miete von 40$."
+    menu:
+        "Miete bar bezahlen (-40$)" if geld >= 40:
+            $ geld -= 40
+            $ miete_bezahlt = True
+            jump wohnheim_flur
+        "Die Miete durch Gefälligkeiten abgelten" if krause_korruption >= 8:
+            "Sie zwinkert dir zu und vertröstet dich auf ein nächtliches Treffen im Büro."
+            $ miete_bezahlt = True
+            jump wohnheim_flur
+        "Sagen, dass du kein Geld hast":
+            $ krause_beziehung -= 3
+            $ miete_bezahlt = True
+            jump wohnheim_flur
+
+label sarah_schenkt_geschenk:
+    s "Hey Max! Hier ist ein bisschen Taschengeld für dich!"
+    $ geld += 20
+    $ sarah_event_erledigt = True
+    jump wohnheim_flur
+
+label wochenend_markt:
+    "Du schlenderst über den Markt."
+    menu:
+        "Ein Parfüm für Sarah kaufen (-15$)" if geld >= 15 and "Parfüm" not in inventar:
+            $ geld -= 15
+            $ inventar.append("Parfüm")
+            jump wohnheim_flur
+        "Zurück":
+            jump wohnheim_flur
+
+# =========================================================================
+# ZUSÄTZLICHE SYSTEM-DEFINITIONEN AUS SCRIPT2
+# =========================================================================
+define b = Character("Frau Berg", color="#ffaa66")
+define el = Character("Elena", color="#ffaad4")
+define b_handy = Character("Frau Berg (SMS)", color="#ffd8aa")
+default max_energie = 100
+default sarah_traegt_outfit = False
+default krause_traegt_outfit = False
+default berg_beziehung = 0
+default berg_korruption = 0
+default berg_schwanger = False
+default berg_tage_seit_sex = 0
+default berg_test_verlangt = False
+default berg_test_bestanden = False
+default elena_beziehung = 0
+default elena_korruption = 0
+default elena_schwanger = False
+default elena_tage_seit_sex = 0
+default elena_test_verlangt = False
+default elena_test_bestanden = False
+
+label handy_sms_menue:
+    menu:
+        "Sarah schreiben":
+            m "Hey Sarah, was machst du gerade?"
+            s_handy "Hey Max! Bin in meinem Zimmer... komm doch einfach rüber."
+            jump handy_sms_menue
+        "Frau Krause schreiben":
+            m "Guten Abend Frau Krause, alles ruhig im Wohnheim?"
+            k_handy "Herr Max, kümmern Sie sich um Ihr Studium! Aber nett, dass Sie fragen."
+            jump handy_sms_menue
+        "Zurück":
+            jump handy_menue
+
+label handy_shop_menue:
+    "--- AMAZON & LIEFERDIENST ---"
+    menu:
+        "Fast-Food bestellen (-15$)" if geld >= 15:
+            $ geld -= 15
+            $ inventar.append("Essen (Snacks)")
+            "Du hast eine Pizza bestellt. Sie wurde diskret vor deine Zimmertür gelegt."
+            jump handy_shop_menue
+        "Flasche Wodka bestellen (-25$)" if geld >= 25:
+            $ geld -= 25
+            $ inventar.append("Alkohol (Wodka)")
+            "Du hast eine Flasche harten Alkohol im Express-Versand bestellt."
+            jump handy_shop_menue
+        "Zurück":
+            jump handy_menue
+
+label handy_sexshop_app:
+    "--- AMOR'S CHOICE (ADULT SHOP) ---"
+    menu:
+        "Vibrator / Intim-Spielzeug bestellen (-35$)" if geld >= 35:
+            $ geld -= 35
+            $ inventar.append("Intim-Spielzeug")
+            "Erfolgreich bestellt! Ein unauffälliges, neutral verpacktes Paket wird geliefert."
+            jump handy_sexshop_app
+        "Reizwäsche / Knappes Outfit bestellen (-50$)" if geld >= 50:
+            $ geld -= 50
+            $ inventar.append("Knappes Outfit")
+            "Erfolgreich bestellt! Ein diskretes Paket mit heißer Unterwäsche ist auf dem Weg."
+            jump handy_sexshop_app
+        "Zurück":
+            jump handy_menue
+
 label universitaet:
     "Du betrittst das Universitätsgebäude."
     if berg_test_verlangt and not berg_test_bestanden:
@@ -663,148 +890,6 @@ label sportstudio:
         "Zurück zum Wohnheim":
             jump wohnheim_flur
 
-label gemeinschaftsdusche:
-    "Du betrittst die feuchten Gemeinschaftsduschen des Wohnheims."
-    if tageszeit == "Nachmittag" or tageszeit == "Abend":
-        menu:
-            "Nachsehen, wer unter der Dusche steht":
-                $ wurf = renpy.random.randint(1, 2)
-                if wurf == 1 and sarah_korruption >= 20:
-                    jump dusche_sarah_event
-                elif wurf == 2 and krause_korruption >= 20:
-                    jump dusche_krause_event
-                else:
-                    "Die Duschen sind im Moment leer."
-                    jump wohnheim_flur
-            "Zurück":
-                jump wohnheim_flur
-    else:
-        "Es ist niemand in den Duschen."
-        jump wohnheim_flur
-
-label dusche_sarah_event:
-    "Du öffnest den Vorhang. Sarah steht nackt unter dem warmen Wasser. Das Wasser läuft über ihre prallen Brüste."
-    s "Max! Oh... komm rein zu mir..."
-    menu:
-        "Sie nackt an die Fliesen drücken und ficken":
-            "Du ziehst deine Sachen aus, drückst Sarah mit dem Gesicht an die nassen Fliesen, saugst an ihrem Hals und schiebst deinen harten Schwanz von hinten tief in ihre nasse Fotze hinein."
-            "Das Wasser spritzt, während du sie im Stehen durchvögelst – immer wieder tief rein und raus."
-            if sarah_test_bestanden:
-                s "Ahhh, Max! Ja, ficke deine schwangere Mitbewohnerin unter der Dusche! Ramm ihn ganz tief rein!"
-            else:
-                s "Ahhh, Max! Ja, ficke mich unter der Dusche! Ramm ihn tief in meine Gebärmutter, mach mich schwanger im nassen Wasser!"
-            $ sarah_schwanger = True
-            $ sarah_tage_seit_sex = 0
-            "Du hältst sie fest und spritzt deine Ladung Sperma voll in ihr Inneres."
-            $ sarah_korruption += 15
-            $ energie -= 40
-            jump mein_zimmer_schlafen
-        "Gehen":
-            jump wohnheim_flur
-
-label dusche_krause_event:
-    "Du hörst Wasser laufen. Frau Krause steht komplett nackt in der Kabine und wäscht ihren reifen Körper."
-    k "Herr Max? Oh... Schauen Sie nicht so... Oder kommen Sie lieber her?"
-    menu:
-        "Die Vermieterin unter der Dusche nehmen":
-            "Du steigst nackt zu ihr in die Kabine. Du drehst sie um, packst ihre schweren Brüste von hinten, saugst an ihren Schultern und rammst deinen harten Schwanz tief in sie hinein."
-            "Du bewegst deine Hüften wild und schiebst ihn unbarmherzig rein und raus, während das Wasser auf euch niederprallt."
-            if krause_test_bestanden:
-                k "Ahhh! Max, ja! Ficke mich schwanger gegen die Wand! Saug an meinen nassen Titten!"
-            else:
-                k "Ahhh! Max, du ungezogenes Tier! Ficke mich härter gegen die Wand! Spritz mich voll, mach mich schwanger unter der Dusche!"
-            $ krause_schwanger = True
-            $ krause_tage_seit_sex = 0
-            "Am Ende feuerst du dein ganzes Sperma kochend heiß tief in ihre Fotze rein."
-            $ krause_korruption += 15
-            $ energie -= 40
-            jump mein_zimmer_schlafen
-        "Gehen":
-            jump wohnheim_flur
-
-label arbeiten:
-    $ geld += 50
-    $ energie -= 40
-    $ heute_gearbeitet = True
-    "Du hast im Cafe gejobbt. +50$, -40 Energie."
-    if tageszeit == "Morgen":
-        $ tageszeit = "Nachmittag"
-    elif tageszeit == "Nachmittag":
-        $ tageszeit = "Abend"
-    else:
-        $ tageszeit = "Nacht"
-    jump wohnheim_flur
-
-label sarah_bettelt_event:
-    "Du bist nachts auf dem Flur. Plötzlich öffnet sich Sarahs Tür. Sie trägt nur ein kurzes Top, ihre nackten Titten schimmern durch."
-    if sarah_test_bestanden:
-        s "Max... dein Baby in mir macht mich so verdammt heiß... Bitte komm rein und nimm meine schwangere Fotschema hart ran!"
-    else:
-        s "Max... ich kann nicht schlafen. Meine Muschi ist so heiß und nass... Bitte komm rein und ficke mich! Ich bettle dich an, nimm mich hart und mach mich schwanger!"
-    menu:
-        "Ihr Flehen erhören und sie im Bett durchvögeln":
-            if sarah_test_bestanden:
-                jump sarah_schwanger_sex_menue
-            else:
-                jump sarah_vollsex_szene
-        "Sie ignorieren":
-            "Du lässt sie stehen. Sie jammert leise."
-            jump wohnheim_flur
-
-label krause_bettelt_event:
-    "Frau Krause kommt nachts im transparenten Morgenmantel die Treppe herunter."
-    if krause_test_bestanden:
-        k "Max... Ich brauche deinen Schwanz in meinem schwangeren Körper! Ficke mich direkt hier auf dem Boden!"
-    else:
-        k "Max... Ich halte es in meinem Bett nicht mehr aus. Ich brauche deinen harten Schwanz! Ficke die alte Vermieterin, ramm ihn tief rein und mach mich schwanger, ich flehe dich an!"
-    menu:
-        "Die Vermieterin auf dem Flurboden flachlegen":
-            "Du reißt ihren Mantel auf, saugst wild an ihren Brüsten und rammst deinen Schwanz direkt auf dem Boden tief in sie hinein."
-            if krause_test_bestanden:
-                k "Ahhh! Ja, ficke deinen ungeborenen Nachwuchs direkt auf dem Flur!"
-            else:
-                k "Ahhh! Ja, ficke mich wie eine Läufige direkt auf dem Flur! Spritz mich voll!"
-            $ krause_schwanger = True
-            $ krause_tage_seit_sex = 0
-            $ krause_korruption += 10
-            jump mein_zimmer_schlafen
-        "Sie wegschicken":
-            jump wohnheim_flur
-
-label sarah_test_trigger_event:
-    $ sarah_test_verlangt = True
-    s "Max... meine Tage sind überfällig und mir ist so schlecht. Bitte besorge mir sofort einen Schwangerschaftstest!"
-    jump wohnheim_flur
-
-label sarah_test_abgabe_label:
-    s "Hast du den Schwangerschaftstest, Max?"
-    menu:
-        "Ihr den Test geben" if "Schwangerschaftstest" in inventar:
-            $ inventar.remove("Schwangerschaftstest")
-            "Der Test zeigt zwei deutliche Streifen: POSITIV."
-            s "Oh mein Gott, Max... Es hat wirklich geklappt! Du hast mich schwanger gefickt! Ich bekomme dein Kind!"
-            $ sarah_test_bestanden = True
-            jump wohnheim_flur
-        "Sagen, dass du noch keinen hast":
-            jump wohnheim_flur
-
-label krause_test_trigger_event:
-    $ krause_test_verlangt = True
-    k "Max... wir haben ein Problem. Mir ist speiübel. Besorge mir unauffällig einen Schwangerschaftstest!"
-    jump wohnheim_flur
-
-label krause_test_abgabe_label:
-    k "Haben Sie den Test besorgt, Max?"
-    menu:
-        "Ihr den Test geben" if "Schwangerschaftstest" in inventar:
-            $ inventar.remove("Schwangerschaftstest")
-            "Der Test ist glasklar POSITIV."
-            k "Ich fass es nicht... Ich bin schwanger von meinem Studenten! Du hast mich geschwängert, Max! Ich trage deine Brut in mir!"
-            $ krause_test_bestanden = True
-            jump wohnheim_flur
-        "Sagen, dass du noch keinen hast":
-            jump wohnheim_flur
-
 label berg_test_trigger_event:
     $ berg_test_verlangt = True
     b "Max... Besorgen Sie mir sofort einen Test!"
@@ -835,36 +920,4 @@ label elena_test_abgabe_label:
             $ elena_test_bestanden = True
             jump wohnheim_flur
         "Sagen, dass du noch keinen hast":
-            jump wohnheim_flur
-
-label krause_miete_event:
-    k "Max! Es ist Sonntagabend. Ich brauche die wöchentliche Miete von 40$."
-    menu:
-        "Miete bar bezahlen (-40$)" if geld >= 40:
-            $ geld -= 40
-            $ miete_bezahlt = True
-            jump wohnheim_flur
-        "Die Miete durch Gefälligkeiten abgelten" if krause_korruption >= 8:
-            "Sie zwinkert dir zu und vertröstet dich auf ein nächtliches Treffen im Büro."
-            $ miete_bezahlt = True
-            jump wohnheim_flur
-        "Sagen, dass du kein Geld hast":
-            $ krause_beziehung -= 3
-            $ miete_bezahlt = True
-            jump wohnheim_flur
-
-label sarah_schenkt_geschenk:
-    s "Hey Max! Hier ist ein bisschen Taschengeld für dich!"
-    $ geld += 20
-    $ sarah_event_erledigt = True
-    jump wohnheim_flur
-
-label wochenend_markt:
-    "Du schlenderst über den Markt."
-    menu:
-        "Ein Parfüm für Sarah kaufen (-15$)" if geld >= 15 and "Parfüm" not in inventar:
-            $ geld -= 15
-            $ inventar.append("Parfüm")
-            jump wohnheim_flur
-        "Zurück":
             jump wohnheim_flur
