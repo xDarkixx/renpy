@@ -72,7 +72,27 @@ style matrix_say_text:
 screen say(who, what):
     zorder 100
 
-    if who and matrix_character_for(who):
+    # Sarah bekommt hier ihren vorhandenen PNG-Sprite plus Gesichts-Layer.
+    # Dadurch wird die bisherige Sarah-SVG nicht zusätzlich angezeigt.
+    if who == "Sarah" or who == "Sarah (SMS)":
+        add "sarah_visual_base" at sarah_visual_base_pos
+
+        if sarah_visual_eyes == "closed":
+            add "sarah_visual_eyes_closed" at sarah_visual_face_pos
+        elif sarah_visual_eyes == "ahegao":
+            add "sarah_visual_eyes_ahegao" at sarah_visual_face_pos
+        else:
+            add "sarah_visual_eyes_wink" at sarah_visual_face_pos
+
+        if sarah_visual_mouth == "pout":
+            add "sarah_visual_mouth_pout" at sarah_visual_face_pos
+        elif sarah_visual_mouth == "smirk":
+            add "sarah_visual_mouth_smirk" at sarah_visual_face_pos
+        elif sarah_visual_mouth == "talk":
+            add "sarah_visual_mouth_talk" at sarah_visual_face_pos
+        else:
+            add "sarah_visual_mouth_smile" at sarah_visual_face_pos
+    elif who and matrix_character_for(who):
         add expression matrix_character_for(who) at matrix_character_sprite
 
     window:
