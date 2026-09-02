@@ -284,3 +284,90 @@ label sarah_erwachsenen_menue:
     menu:
         "Ihr Top ausziehen und an den Brüsten saugen" if sarah_korruption >= 12:
             jump sarah_ausziehen_szene
+        "Einen tiefen Blowjob fordern" if sarah_korruption >= 20:
+            jump sarah_blowjob_szene
+        "Die Kleidung komplett ablegen und schmutzig ficken" if sarah_korruption >= 25:
+            jump sarah_vollsex_szene
+        "Ihre enge Kehrseite nehmen (Anal)" if sarah_korruption >= 35:
+            jump sarah_anal_szene
+        "Ihr Zimmer verlassen":
+            jump wohnheim_flur
+
+label sarah_ausziehen_szene:
+    m "Zieh das Top aus. Ich will deine Brüste sehen."
+    s "Na gut, wenn du so heiß darauf bist..."
+    "Sie wirft ihr Oberteil weg. Du greifst ihre nackten Brüste, knetest das pralle Fleisch fest mit den Händen und fängst an, gierig an ihren harten Nippeln zu saugen und ihre Titten komplett nass zu lecken."
+    s "Ah... Max, ja! Saug fester an meinen Zitzen... das treibt mich um den Verstand..."
+    $ sarah_korruption += 5
+    $ energie -= 20
+    jump sarah_erwachsenen_menue
+
+label sarah_blowjob_szene:
+    "Sarah kniet sich vor dich hin und holt deinen harten Schwanz aus der Hose. Sie leckt einmal von unten bis zur Eichel an ihm hoch."
+    "Sie öffnet weit ihren feuchten Mund, umschließt deine Eichel und saugt deinen Riemen tief bis zum Anschlag in ihren Hals."
+    s "Mmh.. mhh.."
+    "Du packst ihre Haare fest und stößt rhythmisch tief in ihren Mund, während sie dich gierig mit Speichel bedeckt."
+    menu:
+        "In ihren Mund abspritzen und schlucken lassen":
+            "Du stöhnst laut auf, stößt tief in ihren Hals und spritzt deine dicke, weiße Ladung Sperma direkt in ihren Mund. Sie schluckt alles gierig runter und streckt dir ihre weiße Zunge entgegen."
+            s "Mmh, lecker... Ich liebe deinen warmen Saft, Max. Das ist so ein toller Geschmack."
+            $ sarah_korruption += 8
+            $ energie -= 25
+            jump mein_zimmer_schlafen
+        "Auf ihre Titten abspritzen (Nicht schlucken)":
+            "Du ziehst deinen Schwanz im letzten Moment aus ihrem Mund und spritzt dein ganzes Sperma in dicken Fontänen über ihre prallen Brüste."
+            s "Oh ja... Schau dir an, wie viel Saft du hast, Max! Ich liebe es, wenn du mich so einsaust."
+            $ sarah_korruption += 5
+            $ energie -= 25
+            jump mein_zimmer_schlafen
+
+label sarah_vollsex_szene:
+    "Alle Kleider fliegen weg. Du saugst wild an ihren Brüsten, während deine Finger ihre nasse Fotze massieren."
+    s "Ficke mich jetzt, Max! Ramm ihn ganz tief in mich rein!"
+    "Du drückst ihre Beine weit auseinander, setzt an ihrer triefenden Muschi am und rammst deinen harten Schwanz mit einem heftigen Stoß ganz tief in sie hinein."
+    "Das feuchte, klatschende Geräusch eurer Körper erfüllt den Raum. Du ziehst ihn fast ganz heraus und schiebst ihn direkt wieder bis zum Anschlag rein."
+    s "Ohhh Gott, ja! Ficke meine geile Fotze härter! Ramm ihn bis an meine Gebärmutter!"
+    "Du packst ihre Hüften und vögelst sie immer schneller durch. Ihr enges Fleisch umschließt dich heiß."
+    menu:
+        "Rausziehen und auf ihr Gesicht abspritzen":
+            "Kurz vor dem Orgasmus ziehst du deinen Schwanz mit einem Ruck aus ihrer Fotze und spritzt deine klebrige Ladung Sperma komplett über ihr Gesicht."
+            s "Mmh... das war so verdammt geil, Max. Schau dir die Sauerei an."
+            $ sarah_korruption += 5
+            $ energie -= 45
+            jump mein_zimmer_schlafen
+        "Voll in ihr abspritzen (Sperma in die Fotze pumpen!)":
+            s "Nein, zieh nicht raus! Spritz in mir ab! Mach mich schwanger, Max! Füll meine Fotze ganz mit deinem Samen!"
+            "Du bleibst ganz tief in ihr drin, drückst dich fest gegen ihr Becken und feuerst Stoß um Stoß deines warmen Spermas direkt in ihre Gebärmutter."
+            s "Ahhh Max! Ja, pump mich voll! Ich will dein Kind in mir tragen!"
+            "Du ziehst deinen schlaffen Riemen langsam heraus. Dein weißer Saft läuft ihr in dicken Tropfen aus der gedehnten Fotze."
+            $ sarah_schwanger = True
+            $ sarah_tage_seit_sex = 0
+            $ sarah_korruption += 25
+            $ energie -= 50
+            jump mein_zimmer_schlafen
+
+label sarah_anal_szene:
+    "Du drehst Sarah auf den Bauch, sodass ihr knackiger Arsch vor dir aufragt."
+    "Du spuckst auf deinen Schwanz, reibst ihre Rosette ein und drückst deine Eichel langsam, aber kraftvoll in ihr enges Poloch hinein."
+    s "Ahhh! Max, das ist so enge! Aber ja... ramm ihn mir in den Arsch! Ficke meine enge Rosette!"
+    "Du hältst sie fest an den Hüften und schiebst ihn ganz rein. Du ziehst ihn raus und rammst ihn rücksichtslos wieder tief in ihren Anus."
+    s "Ohhh ja, ficke meinen Arsch härter! Zerstör mich!"
+    "Nach unzähligen harten Stößen ziehst du ihn heraus und feuerst deine dicke Ladung komplett über ihre Pobacken."
+    $ sarah_korruption += 20
+    $ energie -= 45
+    jump mein_zimmer_schlafen
+
+label sarah_schwanger_sex_menue:
+    s "Max... seit ich schwanger von dir bin, bin ich noch viel unartiger und geiler geworden. Ficke deinen ungeborenen Nachwuchs tief in mir durch!"
+    menu:
+        "Deine schwangere Mitbewohnerin intensiv durchvögeln":
+            "Du ziehst sie nackt aus. Ihre Brüste sind durch die Schwangerschaft noch schwerer geworden. Du leckst ihre Nippel und drückst sie aufs Bett."
+            "Du schiebst deinen harten Schwanz langsam und tief in ihre kochend heiße, schwangere Fotze rein."
+            "Euer ganzer Körper bewegt sich im Rhythmus, während du den Schwanz rein- und rausziehst."
+            s "Ahhh, Max! Ja! Ficke mich und dein Baby! Ramm ihn ganz tief rein, füll mich wieder mit deinem heißem Sperma auf!"
+            "Du feuerst eine gigantische Ladung Samen direkt vor den Muttermund ihrer schwangeren Spalte."
+            $ sarah_korruption += 10
+            $ energie -= 45
+            jump mein_zimmer_schlafen
+        "Ihr Zimmer verlassen":
+            jump wohnheim_flur
