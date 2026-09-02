@@ -219,16 +219,11 @@ label handy_menue:
             "Elena (Park) - Korruption: [elena_korruption] | Oberweite: 100F"
             "Schwester Agnes - Korruption: [agnes_korruption] | Oberweite: 85D"
             "--- FREIGESCHALTETE TEXT-SELFIES ---"
-                if hat_selfie_sarah:
-                    "- Sarahs Reizwäsche-Selfie freigeschaltet"
-                if hat_selfie_krause:
-                    "- Frau Krauses Morgenmantel-Selfie freigeschaltet"
-                if hat_selfie_berg:
-                    "- Frau Bergs geöffnetes Blusen-Selfie freigeschaltet"
-                if hat_selfie_elena:
-                    "- Elenas enges Kleid-Selfie freigeschaltet"
-                if hat_selfie_agnes:
-                    "- Schwester Agnes' abgelegtes Tracht-Selfie freigeschaltet"
+            "- Sarahs Reizwäsche-Selfie freigeschaltet" if hat_selfie_sarah:
+            "- Frau Krauses Morgenmantel-Selfie freigeschaltet" if hat_selfie_krause:
+            "- Frau Bergs geöffnetes Blusen-Selfie freigeschaltet" if hat_selfie_berg:
+            "- Elenas enges Kleid-Selfie freigeschaltet" if hat_selfie_elena:
+            "- Schwester Agnes' abgelegtes Tracht-Selfie freigeschaltet" if hat_selfie_agnes:
             jump handy_menue
             
         "SMS-Messenger & Sexting":
