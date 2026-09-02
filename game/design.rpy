@@ -3,32 +3,36 @@
 # Preserves all existing dialogue and menu strings.
 # =========================================================================
 
+image bg_room = "images/backgrounds/room.svg"
+image bg_park = "images/backgrounds/park.svg"
+image bg_university = "images/backgrounds/university.svg"
+
 init python:
     # Use the new vector artwork without changing any script text.
     gui.main_menu_background = "gui/main_menu.svg"
     gui.game_menu_background = "images/backgrounds/room.svg"
 
     def _design_label_callback(label_name, jumped):
-        """Automatically selects a visual backdrop when entering major locations."""
+        """Select a visual backdrop when entering major locations."""
         backgrounds = {
-            "wohnheim_flur": "images/backgrounds/room.svg",
-            "mein_zimmer": "images/backgrounds/room.svg",
-            "mein_zimmer_schlafen": "images/backgrounds/room.svg",
-            "sarahs_zimmer": "images/backgrounds/room.svg",
-            "krause_buero": "images/backgrounds/room.svg",
-            "apotheke": "images/backgrounds/room.svg",
-            "sportstudio": "images/backgrounds/room.svg",
-            "gemeinschaftsdusche": "images/backgrounds/room.svg",
-            "stadtkirche": "images/backgrounds/room.svg",
-            "wochenend_markt": "images/backgrounds/room.svg",
-            "arbeiten": "images/backgrounds/room.svg",
-            "universitaet": "images/backgrounds/university.svg",
-            "stadtpark": "images/backgrounds/park.svg",
+            "wohnheim_flur": "bg_room",
+            "mein_zimmer": "bg_room",
+            "mein_zimmer_schlafen": "bg_room",
+            "sarahs_zimmer": "bg_room",
+            "krause_buero": "bg_room",
+            "apotheke": "bg_room",
+            "sportstudio": "bg_room",
+            "gemeinschaftsdusche": "bg_room",
+            "stadtkirche": "bg_room",
+            "wochenend_markt": "bg_room",
+            "arbeiten": "bg_room",
+            "universitaet": "bg_university",
+            "stadtpark": "bg_park",
         }
-        path = backgrounds.get(label_name)
-        if path:
+        image_name = backgrounds.get(label_name)
+        if image_name:
             renpy.scene()
-            renpy.show(path, layer="master")
+            renpy.show(image_name, layer="master")
 
     config.label_callbacks.append(_design_label_callback)
 
