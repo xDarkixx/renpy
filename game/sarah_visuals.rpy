@@ -8,7 +8,7 @@ image sarah_visual_base = Transform(
     xysize=(480, 960)
 )
 
-# Vorhandene Gesichts-Layer. Die Assets liegen als transparente PNGs vor.
+# Vorhandene Gesichts-Layer.
 image sarah_visual_eyes_closed = Transform(
     "images/characters/eyes_closed.png",
     xysize=(480, 480)
@@ -35,7 +35,6 @@ image sarah_visual_mouth_talk = Transform(
     xysize=(480, 480)
 )
 
-# Standardausdruck für den ersten Test.
 default sarah_visual_eyes = "wink"
 default sarah_visual_mouth = "smile"
 
@@ -48,12 +47,10 @@ transform sarah_visual_face_pos:
     yalign 0.0
 
 screen sarah_visual():
-    zorder 5
+    zorder 0
 
-    # Charakterkörper
     add "sarah_visual_base" at sarah_visual_base_pos
 
-    # Gesichtslayer sitzt auf derselben oberen Fläche wie der Charakterkopf.
     if sarah_visual_eyes == "closed":
         add "sarah_visual_eyes_closed" at sarah_visual_face_pos
     elif sarah_visual_eyes == "ahegao":
@@ -69,12 +66,10 @@ screen sarah_visual():
         add "sarah_visual_mouth_smile" at sarah_visual_face_pos
 
 init python:
-    # Nur bei Sarah-Labels einblenden. Außerhalb davon wird der Charakter
-    # automatisch entfernt. Bestehender Dialog/Menütext bleibt unangetastet.
-    def _sarah_visual_label_callback(label_name):
+    def _sarah_visual_label_callback(label_name, abnormal):
         if label_name.startswith("sarah"):
-            renpy.show_screen("sarah_visual")
+            renpy.show_screen("sarah_visual", _layer="master")
         else:
-            renpy.hide_screen("sarah_visual")
+            renpy.hide_screen("sarah_visual", _layer="master")
 
     config.label_callbacks.append(_sarah_visual_label_callback)
