@@ -92,7 +92,7 @@ label wohnheim_flur:
     "Tag: [tag_name]"
     "Tageszeit: [tageszeit]"
     "Geld: [geld]$"
-    "Energie: [energie]%"
+    "Energie: [energie]%%"
     "----------------------------------------"
     "Sarah – Beziehung: [sarah_beziehung]"
     "Sarah – Status: [sarah_korruption]"
