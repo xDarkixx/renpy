@@ -4,6 +4,12 @@
 # Nur Darstellung, Abstände und Anordnung wurden verbessert.
 # ============================================================
 
+# Statistik-HUD automatisch als Overlay anzeigen.
+# Dadurch muss script.rpy nicht verändert werden.
+init python:
+    if "stats_hud" not in config.overlay_screens:
+        config.overlay_screens.append("stats_hud")
+
 # ------------------------------------------------------------
 # Einheitliche GUI-Stile
 # ------------------------------------------------------------
@@ -60,7 +66,7 @@ screen choice(items):
 # Statistik-HUD
 # ------------------------------------------------------------
 screen stats_hud():
-    zorder 100
+    zorder 90
 
     frame:
         style "hud_frame"
@@ -79,11 +85,15 @@ screen stats_hud():
             text "Sarah: [sarah_beziehung]" size 17
             text "Krause: [krause_beziehung]" size 17
 
+            textbutton "Spielstatistik":
+                xalign 0.5
+                action Show("game_stats")
+
 # ------------------------------------------------------------
 # Spielstatistik
 # ------------------------------------------------------------
 screen game_stats():
-    tag menu
+    zorder 200
     modal True
 
     frame:
