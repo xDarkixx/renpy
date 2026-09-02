@@ -1,192 +1,155 @@
-# ============================================================
-# SPIEL-OBERFLÄCHE / GUI
-# Vorhandene Story- und Dialogtexte werden nicht verändert.
-# ============================================================
+# =========================================================================
+# ERWEITERTE GUI
+# Bestehende Dialog- und Menütexte werden nicht verändert.
+# =========================================================================
 
 init python:
     if "stats_hud" not in config.overlay_screens:
         config.overlay_screens.append("stats_hud")
 
-style hud_frame:
-    background Solid("#171b22")
-    padding (18, 14)
+style matrix_panel:
+    background Solid("#10151d")
+    padding (16, 12)
 
-style stats_frame:
-    background Solid("#171b22")
-    padding (38, 32)
-
-style say_window:
-    background Solid("#101318")
-    padding (28, 22)
-
-style say_name:
-    size 28
+style matrix_title:
+    size 24
     bold True
 
-style say_text:
-    size 24
+style matrix_stat:
+    size 18
 
-style say_button:
+style matrix_small:
+    size 15
+
+style matrix_button:
     xminimum 150
-    yminimum 48
-    padding (18, 10)
+    yminimum 42
+    padding (14, 8)
 
-style choice_vbox:
-    spacing 14
-    xfill True
-
-style choice_button:
+style matrix_choice_button:
     xfill True
     yminimum 58
-    padding (22, 14)
-    background Solid("#202631")
-    hover_background Solid("#303a4a")
-    insensitive_background Solid("#151920")
+    padding (18, 12)
+    background Solid("#202733")
+    hover_background Solid("#354052")
+    insensitive_background Solid("#151a22")
 
-style choice_button_text:
-    size 22
+style matrix_choice_text:
+    size 21
     xalign 0.5
     text_align 0.5
 
-# ============================================================
-# DIALOG-GUI
-# 'what' enthält den bereits vorhandenen Originaltext.
-# Die GUI verändert weder Storytext noch Variablen/Jumps.
-# ============================================================
+style matrix_say_window:
+    background Solid("#0c1016")
+    padding (24, 18)
+
+style matrix_say_name:
+    size 28
+    bold True
+
+style matrix_say_text:
+    size 24
+
 screen say(who, what):
     zorder 100
-
     window:
         id "window"
-        style "say_window"
+        style "matrix_say_window"
         xalign 0.5
         yalign 0.96
-        xmaximum 1180
+        xmaximum 1220
         xfill True
-
         vbox:
-            spacing 10
-
+            spacing 8
             if who:
                 text who:
                     id "who"
-                    style "say_name"
-
+                    style "matrix_say_name"
             text what:
                 id "what"
-                style "say_text"
+                style "matrix_say_text"
                 xfill True
-
-            hbox:
-                xfill True
-                null width 1
-                textbutton "Weiter":
-                    style "say_button"
-                    xalign 1.0
-                    action Dismiss()
-
-    # Weiter per Enter/Leertaste/Escape entsprechend Ren'Py-Dismiss.
+            textbutton "Weiter":
+                style "matrix_button"
+                xalign 1.0
+                action Dismiss()
     key "dismiss" action Continue()
 
-# ============================================================
-# AUSWAHLMENÜS
-# Bestehende Choice-Texte werden direkt angezeigt.
-# ============================================================
 screen choice(items):
     zorder 110
-
     frame:
         xalign 0.5
         yalign 0.78
-        xmaximum 900
+        xmaximum 980
         xfill True
-        padding (24, 24)
-        background Solid("#101318")
-
+        padding (20, 20)
+        background Solid("#0c1016")
         vbox:
-            style "choice_vbox"
-
+            spacing 11
             for item in items:
                 if item.action:
                     textbutton item.caption:
-                        style "choice_button"
-                        text_style "choice_button_text"
+                        style "matrix_choice_button"
+                        text_style "matrix_choice_text"
                         action item.action
                 else:
                     text item.caption:
-                        style "choice_button_text"
+                        style "matrix_choice_text"
                         xfill True
 
-# ============================================================
-# STATISTIK-HUD
-# ============================================================
 screen stats_hud():
     zorder 90
-
     frame:
-        style "hud_frame"
-        xalign 0.98
+        style "matrix_panel"
+        xalign 0.985
         yalign 0.02
-        xminimum 285
-        xmaximum 360
-
+        xminimum 310
+        xmaximum 390
         vbox:
-            spacing 7
-            text "[wochentage[aktueller_tag_index]] – [tageszeit]" size 22 xalign 0.5
+            spacing 6
+            text "MATRIX STATUS" style "matrix_title" xalign 0.5
+            text "[wochentage[aktueller_tag_index]] – [tageszeit]" style "matrix_stat" xalign 0.5
+            null height 4
+            text "Geld: [geld]$" style "matrix_stat"
+            text "Energie: [energie]/[max_energie]" style "matrix_stat"
+            null height 4
+            text "Sarah  | Beziehung: [sarah_beziehung]" style "matrix_small"
+            text "Sarah  | Korruption: [sarah_korruption]" style "matrix_small"
+            text "Krause | Beziehung: [krause_beziehung]" style "matrix_small"
+            text "Krause | Korruption: [krause_korruption]" style "matrix_small"
+            text "Berg   | Beziehung: [berg_beziehung]" style "matrix_small"
+            text "Berg   | Korruption: [berg_korruption]" style "matrix_small"
+            text "Elena  | Beziehung: [elena_beziehung]" style "matrix_small"
+            text "Elena  | Korruption: [elena_korruption]" style "matrix_small"
             null height 5
-            text "Geld: [geld]$" size 18
-            text "Energie: [energie]%" size 18
-            null height 5
-            text "Sarah: [sarah_beziehung]" size 17
-            text "Krause: [krause_beziehung]" size 17
             textbutton "Spielstatistik":
+                style "matrix_button"
                 xalign 0.5
                 action Show("game_stats")
 
-# ============================================================
-# SPIELSTATISTIK
-# ============================================================
 screen game_stats():
     zorder 200
     modal True
-
     frame:
-        style "stats_frame"
+        style "matrix_panel"
         xalign 0.5
         yalign 0.5
-        xminimum 560
-        xmaximum 900
-
+        xminimum 600
+        xmaximum 920
         vbox:
-            spacing 12
-            text "SPIELSTATISTIK" size 36 xalign 0.5
+            spacing 10
+            text "SPIELSTATISTIK" style "matrix_title" xalign 0.5
+            text "Tag: [wochentage[aktueller_tag_index]] | [tageszeit]" style "matrix_stat"
+            text "Geld: [geld]$ | Energie: [energie]/[max_energie]" style "matrix_stat"
             null height 5
-
-            hbox:
-                spacing 55
-                xfill True
-                text "Tag: [wochentage[aktueller_tag_index]]" size 20
-                text "Tageszeit: [tageszeit]" size 20
-
-            hbox:
-                spacing 55
-                xfill True
-                text "Geld: [geld]$" size 20
-                text "Energie: [energie]%" size 20
-
-            null height 10
-            text "Sarah" size 25
-            text "Beziehung: [sarah_beziehung]" size 18
-            text "Status: [sarah_korruption]" size 18
-            text "Sarah – Test: [sarah_test_bestanden]" size 18
-
-            null height 7
-            text "Frau Krause" size 25
-            text "Beziehung: [krause_beziehung]" size 18
-            text "Status: [krause_korruption]" size 18
-            text "Krause – Test: [krause_test_bestanden]" size 18
-
-            null height 14
+            text "Sarah – Beziehung [sarah_beziehung] | Korruption [sarah_korruption]" style "matrix_small"
+            text "Krause – Beziehung [krause_beziehung] | Korruption [krause_korruption]" style "matrix_small"
+            text "Berg – Beziehung [berg_beziehung] | Korruption [berg_korruption]" style "matrix_small"
+            text "Elena – Beziehung [elena_beziehung] | Korruption [elena_korruption]" style "matrix_small"
+            null height 8
+            text "Inventar: [len(inventar)] Gegenstände" style "matrix_stat"
             textbutton "Schließen":
+                style "matrix_button"
                 xalign 0.5
                 action Hide("game_stats")
+
