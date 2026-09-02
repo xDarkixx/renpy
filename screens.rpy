@@ -1,17 +1,14 @@
 # ============================================================
-# SPIEL-OBERFLÄCHE / HUD
-# Bestehende Texte und Spielwerte bleiben unverändert.
-# Nur Darstellung, Abstände und Anordnung wurden verbessert.
+# SPIEL-OBERFLÄCHE / GUI
+# Vorhandene Story- und Dialogtexte werden nicht verändert.
 # ============================================================
 
-# Statistik-HUD automatisch als Overlay anzeigen.
-# Dadurch muss script.rpy nicht verändert werden.
 init python:
     if "stats_hud" not in config.overlay_screens:
         config.overlay_screens.append("stats_hud")
 
 # ------------------------------------------------------------
-# Einheitliche GUI-Stile
+# GUI-Stile
 # ------------------------------------------------------------
 style hud_frame:
     background Solid("#171b22")
@@ -20,6 +17,22 @@ style hud_frame:
 style stats_frame:
     background Solid("#171b22")
     padding (38, 32)
+
+style say_window:
+    background Solid("#101318")
+    padding (28, 22)
+
+style say_name:
+    size 28
+    bold True
+
+style say_text:
+    size 24
+
+style say_button:
+    xminimum 150
+    yminimum 48
+    padding (18, 10)
 
 style choice_vbox:
     spacing 14
@@ -39,11 +52,50 @@ style choice_button_text:
     text_align 0.5
 
 # ------------------------------------------------------------
+# Dialog-GUI
+# Der Parameter 'what' ist der originale Ren'Py-Text.
+# Es wird nur die Darstellung geändert.
+# ------------------------------------------------------------
+screen say(who, what):
+    zorder 100
+
+    window:
+        id "window"
+        style "say_window"
+        xalign 0.5
+        yalign 0.96
+        xmaximum 1180
+        xfill True
+
+        vbox:
+            spacing 10
+
+            if who is not None:
+                text who:
+                    id "who"
+                    style "say_name"
+
+            text what:
+                id "what"
+                style "say_text"
+                xfill True
+
+            hbox:
+                xfill True
+
+                null width 1
+
+                textbutton "Weiter":
+                    style "say_button"
+                    xalign 1.0
+                    action Continue()
+
+# ------------------------------------------------------------
 # Eigene Darstellung der normalen Auswahlmenüs.
-# Die vorhandenen Choice-Texte werden unverändert aus dem Script übernommen.
+# Die vorhandenen Choice-Texte werden unverändert übernommen.
 # ------------------------------------------------------------
 screen choice(items):
-    zorder 100
+    zorder 110
 
     frame:
         xalign 0.5
