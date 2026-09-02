@@ -5,6 +5,15 @@ define m = Character("Max", color="#c8ffc8")
 define s = Character("Sarah", color="#ffc8c8")
 define k = Character("Frau Krause", color="#e0aaff")
 define apo = Character("Apotheker", color="#aaffff")
+define ag = Character("Schwester Agnes", color="#ffffff")
+define ag_handy = Character("Schwester Agnes (SMS)", color="#e6e6e6")
+default agnes_beziehung = 0
+default agnes_korruption = 0
+default agnes_schwanger = False
+default agnes_tage_seit_sex = 0
+default agnes_test_verlangt = False
+default agnes_test_bestanden = False
+default hat_selfie_agnes = False
 define b = Character("Frau Berg", color="#ffaa66")
 define el = Character("Elena", color="#ffaad4")
 define b_handy = Character("Frau Berg (SMS)", color="#ffd8aa")
@@ -79,6 +88,7 @@ label start:
 # =========================================================================
 # 4. HAUPT-HUB (ORTSAUSWAHL)
 # =========================================================================
+
 label wohnheim_flur:
     $ tag_name = wochentage[aktueller_tag_index]
     
@@ -93,24 +103,23 @@ label wohnheim_flur:
     if krause_schwanger and krause_tage_seit_sex >= 3 and not krause_test_verlangt:
         jump krause_test_trigger_event
 
-    # ZUFÄLLIGES BETTEL-EVENT (Triggert nachts auf dem Flur, wenn Korruption sehr hoch ist)
-    if tageszeit == "Nacht" and sarah_korruption >= 35 and renpy.random.randint(1, 100) <= 30:
-        jump sarah_bettelt_event
+    if berg_schwanger and berg_tage_seit_sex >= 3 and not berg_test_trigger_event:
+        jump berg_test_trigger_event
 
-    if tageszeit == "Nacht" and krause_korruption >= 35 and renpy.random.randint(1, 100) <= 30:
-        jump krause_bettelt_event
+    if elena_schwanger and elena_tage_seit_sex >= 3 and not elena_test_verlangt:
+        jump elena_test_trigger_event
 
-    "Status: [tag_name] ([tageszeit]) | Geld: [geld]$ | Energie: [energie]%%"
+    if agnes_schwanger and agnes_tage_seit_sex >= 3 and not agnes_test_verlangt:
+        jump agnes_test_trigger_event
+
+    "Status: [tag_name] ([tageszeit]) | Geld: [geld]$ | Energie: [energie]/[max_energie]"
     "Mädels-Status:"
-    "Sarah - Korruption: [sarah_korruption] | Schwanger: [sarah_schwanger]"
-    "Frau Krause - Korruption: [krause_korruption] | Schwanger: [krause_schwanger]"
+    "Sarah - Korruption: [sarah_korruption] | Frau Krause - Korruption: [krause_korruption]"
+    "Frau Berg - Korruption: [berg_korruption] | Elena - Korruption: [elena_korruption] | Schwester Agnes - Korruption: [agnes_korruption]"
     
     if energie <= 0:
         "Du bist völlig erschöpft! Du musst dich in deinem Zimmer ausruhen."
         jump mein_zimmer_schlafen
-
-    if sarah_beziehung >= 5 and not sarah_event_erledigt:
-        jump sarah_schenkt_geschenk
 
     if neue_nachrichten_anzahl > 0:
         $ zimmer_button_text = "In mein Zimmer (Handy blinkt!)"
@@ -124,12 +133,44 @@ label wohnheim_flur:
             jump mein_zimmer
             
         "In Sarahs Zimmer":
+            if verabredung_wer == "Sarah" and verabredung_ort == "Zimmer":
+                $ verabredung_wer = "Keine"
+                $ verabredung_ort = "Keiner"
+                "Du betrittst das Zimmer. Sarah erwartet dich bereits sehnsüchtig, genau wie per SMS vereinbart."
+                jump sarah_erwachsenen_menue
             jump sarahs_zimmer
             
         "In das Büro der Vermieterin":
+            if verabredung_wer == "Krause" and verabredung_ort == "Büro":
+                $ verabredung_wer = "Keine"
+                $ verabredung_ort = "Keiner"
+                "Frau Krause hat das Büro für eure Verabredung bereits von innen verriegelt."
+                jump krause_erwachsenen_menue
             jump krause_buero
             
+        "Zur Universität gehen" if tageszeit == "Morgen" or tageszeit == "Nachmittag":
+            jump universitaet
+            
+        "Zum Stadtpark gehen (Elena)":
+            if verabredung_wer == "Elena" and verabredung_ort == "Park" and tageszeit == "Nachmittag":
+                $ verabredung_wer = "Keine"
+                $ verabredung_ort = "Keiner"
+                "Elena winkt dir bereits hinter den großen Büschen im Park zu."
+                jump elena_erwachsenen_menue
+            jump stadtpark
+            
+        "Zur Stadtkirche gehen (Schwester Agnes)" if (tag_name == "Samstag" or tag_name == "Sonntag") and (tageszeit == "Morgen" or tageszeit == "Nachmittag"):
+            jump stadtkirche
+            
+        "Zum Sportstudio gehen" if tageszeit == "Nachmittag" or tageszeit == "Abend":
+            jump sportstudio
+            
         "In die Gemeinschaftsdusche":
+            if verabredung_wer == "Sarah" and verabredung_ort == "Dusche":
+                $ verabredung_wer = "Keine"
+                $ verabredung_ort = "Keiner"
+                "Sarah wartet bereits nackt hinter dem Duschvorhang auf dich."
+                jump dusche_sarah_event
             jump gemeinschaftsdusche
             
         "Zur Apotheke gehen" if tageszeit != "Nacht":
@@ -138,22 +179,14 @@ label wohnheim_flur:
         "Zum Samstags-Markt gehen" if tag_name == "Samstag" or tag_name == "Sonntag":
             jump wochenend_markt
             
-        "Zur Universität gehen":
-            jump universitaet
-
-        "Zum Stadtpark gehen":
-            jump stadtpark
-
-        "Zum Sportstudio gehen":
-            jump sportstudio
-
         "Arbeiten gehen (+50$, kostet 40 Energie)" if tageszeit != "Nacht" and not heute_gearbeitet:
             jump arbeiten
 
 
 # =========================================================================
-# 5. ORT: MEIN ZIMMER, SCHLAFEN & HANDY
+# 5. ORT: MEIN ZIMMER, SCHLAFEN & MULTI-APP SMARTPHONE
 # =========================================================================
+
 label mein_zimmer:
     "Du bist in deinem Zimmer."
     
@@ -166,7 +199,7 @@ label mein_zimmer:
         "[handy_button_text]":
             jump handy_menue
             
-        "In den Rucksack schauen (Inventar)":
+        "In den Rucksack schauen (Inventar & Items benutzen)":
             jump rucksack_ansehen
         
         "Im Bett schlafen (Energie aufladen & Zeit voranschreiten lassen)":
@@ -178,25 +211,34 @@ label mein_zimmer:
 label handy_menue:
     "--- SMARTPHONE ---"
     menu:
-        "Posteingang lesen" if neue_nachrichten_anzahl > 0:
-            $ neue_nachrichten_anzahl = 0
-            s_handy "Hey Max! Komm heute mal in mein Zimmer, wenn du Zeit hast."
+        "Spionage-App & Galerie":
+            "--- BIOMETRISCHE DATENBANK ---"
+            "Sarah - Korruption: [sarah_korruption] | Oberweite: 85C"
+            "Frau Krause - Korruption: [krause_korruption] | Oberweite: 95E"
+            "Frau Berg (Lehrerin) - Korruption: [berg_korruption] | Oberweite: 90D"
+            "Elena (Park) - Korruption: [elena_korruption] | Oberweite: 100F"
+            "Schwester Agnes - Korruption: [agnes_korruption] | Oberweite: 85D"
+            "--- FREIGESCHALTETE TEXT-SELFIES ---"
+            if hat_selfie_sarah: "- Sarahs Reizwäsche-Selfie freigeschaltet"
+            if hat_selfie_krause: "- Frau Krauses Morgenmantel-Selfie freigeschaltet"
+            if hat_selfie_berg: "- Frau Bergs geöffnetes Blusen-Selfie freigeschaltet"
+            if hat_selfie_elena: "- Elenas enges Kleid-Selfie freigeschaltet"
+            if hat_selfie_agnes: "- Schwester Agnes' abgelegtes Tracht-Selfie freigeschaltet"
             jump handy_menue
             
-        "Sarah eine SMS schreiben" if neue_nachrichten_anzahl == 0:
-            jump handy_sarah_chat
+        "SMS-Messenger & Sexting":
+            jump handy_sms_menue
             
-        "Frau Krause eine SMS schreiben" if krause_korruption >= 5:
-            jump handy_krause_chat
-            
-        "Shop öffnen":
+        "Online-Shop (Lieferdienst)":
             jump handy_shop_menue
-
-        "Erwachsenen-Shop öffnen":
+            
+        "Amor's Choice (Sex-Shop App)":
             jump handy_sexshop_app
-
+            
         "Handy weglegen":
             jump mein_zimmer
+
+# --- MESSENGER MIT SCHWANGERSCHAFTS-DYNAMIK FÜR SEXTING-ANFRAGEN ---
 
 label handy_sarah_chat:
     menu:
@@ -1018,6 +1060,230 @@ label elena_test_abgabe_label:
             $ inventar.remove("Schwangerschaftstest")
             "Der Test zeigt zwei deutliche Streifen: POSITIV."
             $ elena_test_bestanden = True
+            jump wohnheim_flur
+        "Sagen, dass du noch keinen hast":
+            jump wohnheim_flur
+
+
+label handy_sms_menue:
+    "--- MESSENGER ---"
+    "Aktive Verabredung: [verabredung_wer] -> [verabredung_ort]"
+    menu:
+        "Sarah (Mitbewohnerin)":
+            jump handy_chat_sarah
+        "Frau Krause (Vermieterin)" if krause_beziehung >= 4:
+            jump handy_chat_krause
+        "Frau Berg (Lehrerin)" if berg_beziehung >= 4:
+            jump handy_chat_berg
+        "Elena (Park)" if elena_beziehung >= 4:
+            jump handy_chat_elena
+        "Schwester Agnes (Nonne)" if agnes_beziehung >= 4:
+            jump handy_chat_agnes
+        "Zurück":
+            jump handy_menue
+
+
+label handy_chat_sarah:
+    menu:
+        "Stimmungs-Barometer abfragen":
+            m "Sarah, wie fühlst du dich gerade?"
+            if sarah_korruption >= 40:
+                s_handy "Ich bin total unruhig und mein Körper brennt vor Verlangen... Ich würde im Zimmer im Moment absolut alles tun, was du verlangst, Master."
+            elif sarah_korruption >= 20:
+                s_handy "Ich bin ein bisschen aufgeregt, wenn ich an uns denke. Ein Besuch von dir würde mir jetzt gefallen."
+            else:
+                s_handy "Ganz normal, ich lerne gerade ein bisschen für die Uni."
+            jump handy_chat_sarah
+        "Nach intimen Fotos / Brüsten fragen" if sarah_korruption >= 25:
+            m "Schick mir ein heißes Bild von dir, Sarah."
+            if not hat_selfie_sarah:
+                $ hat_selfie_sarah = True
+                $ sarah_korruption += 10
+                s_handy "Sarah sendet ein brandneues Text-Selfie im neuen, extrem knappen Outfit. Ihre Oberweite (85C) kommt darin perfekt zur Geltung."
+                s_handy "Hier... ich hoffe, das reicht dir, um dich anzustacheln. Komm jetzt rüber!"
+            else:
+                s_handy "Du hast doch schon eins! Komm lieber live in mein Zimmer."
+            jump handy_chat_sarah
+        "Nach Sex verabreden / Einladen":
+            menu:
+                "Zu mir ins Zimmer bestellen" if sarah_korruption >= 20:
+                    $ verabredung_wer = "Sarah"
+                    $ verabredung_ort = "Zimmer"
+                    s_handy "Alles klar, ich schleiche mich gleich rüber zu dir..."
+                "In die Gemeinschaftsdusche bestellen" if sarah_korruption >= 30:
+                    $ verabredung_wer = "Sarah"
+                    $ verabredung_ort = "Dusche"
+                    s_handy "In die feuchte Dusche? Oh ja... ich gehe schon mal vor und ziehe mich nackt aus."
+                "Abbrechen":
+                    pass
+            jump handy_sms_menue
+        "Zurück":
+            jump handy_sms_menue
+
+
+label handy_chat_krause:
+    menu:
+        "Stimmungs-Barometer abfragen":
+            m "Frau Krause, sind Sie beschäftigt?"
+            if krause_korruption >= 40:
+                k_handy "Ich sitze ungeduldig im Büro... mein Gehorsam gehört ganz dir, Max. Ich kann mich auf keine Akten mehr konzentrieren."
+            elif krause_korruption >= 20:
+                k_handy "Ich bin etwas abgelenkt heute. Wenn Sie eine Frage zur Miete haben, kommen Sie ruhig vorbei."
+            else:
+                k_handy "Ich bearbeite die Verträge des Wohnheims. Bitte stören Sie nur bei wichtigen Anliegen."
+            jump handy_chat_krause
+        "Nach intimen Fotos / Brüsten fragen" if krause_korruption >= 25:
+            m "Frau Krause, zeigen Sie mir, was Sie unter Ihrem Kostüm tragen."
+            if not hat_selfie_krause:
+                $ hat_selfie_krause = True
+                $ krause_korruption += 10
+                k_handy "Frau Krause sendet ein Text-Selfie aus ihrem privaten Wohnzimmer. Sie trägt einen transparenten Morgenmantel, der ihre reife Oberweite (95E) betont."
+                k_handy "Unerhört, dass ich mich auf so etwas einlasse... Löschen Sie das sofort nach dem Ansehen!"
+            else:
+                k_handy "Ein Bild muss genügen. Kommen Sie für den Rest in mein Büro."
+            jump handy_chat_krause
+        "Nach Sex verabreden / Einladen" if krause_korruption >= 25:
+            $ verabredung_wer = "Krause"
+            $ verabredung_ort = "Büro"
+            k_handy "Einverstanden. Ich sperre die Bürotür von innen ab. Klopfen Sie dreimal."
+            jump handy_sms_menue
+        "Zurück":
+            jump handy_sms_menue
+
+
+label handy_chat_berg:
+    menu:
+        "Stimmungs-Barometer abfragen":
+            m "Frau Berg, wie läuft die Korrektur der Arbeiten?"
+            if berg_korruption >= 40:
+                b_handy "Ich bin völlig fahrig, Max... Die Erinnerung an die Toilette lässt mich zittern. Ich würde jede Note für dich ändern."
+            elif berg_korruption >= 20:
+                b_handy "Ich bin ein wenig gestresst, aber für ein privates Gespräch unter vier Augen habe ich immer Zeit."
+            else:
+                b_handy "Ich bin sehr beschäftigt mit den Prüfungsbögen. Bitte halten Sie die offiziellen Zeiten ein."
+            jump handy_chat_berg
+        "Nach intimen Fotos / Brüsten fragen" if berg_korruption >= 25:
+            m "Frau Berg, senden Sie mir einen privaten Einblick aus Ihrem Pausenraum."
+            if not hat_selfie_berg:
+                $ hat_selfie_berg = True
+                $ berg_korruption += 10
+                b_handy "Frau Berg sendet ein Text-Selfie aus dem leeren Hörsaal. Ihre Bluse ist weit aufgeknöpft, ihre prallen Brüste (90D) schimmern im Licht."
+                b_handy "Wenn das ein Kollege findet, bin ich ruiniert. Du hast mich vollkommen in der Hand, Max."
+            else:
+                b_handy "Mehr Fotos gibt es nicht. Besuchen Sie mich lieber an der Universität."
+            jump handy_chat_berg
+        "Zurück":
+            jump handy_sms_menue
+
+
+label handy_chat_elena:
+    menu:
+        "Stimmungs-Barometer abfragen":
+            m "Elena, wie ist die Lage bei dir?"
+            if elena_korruption >= 40:
+                el_handy "Ich bin kochend heiß, mein Großer! Mein Körper verlangt nach dir."
+            elif elena_korruption >= 20:
+                el_handy "Ich bin in Flirtstimmung. Ein bisschen Ablenkung würde mir jetzt guttun."
+            else:
+                el_handy "Ich entspanne mich ein bisschen an der frischen Luft."
+            jump handy_chat_elena
+        "Nach intimen Fotos / Brüsten fragen" if elena_korruption >= 25:
+            m "Elena, schick mir einen Vorgeschmack auf deine Kurven."
+            if not hat_selfie_elena:
+                $ hat_selfie_elena = True
+                $ elena_korruption += 10
+                el_handy "Elena sendet ein Text-Selfie direkt von der Parkbank. Ihr figurbetontes Kleid ist tief ausgeschnitten und setzt ihre gewaltige Oberweite (100F) perfekt in Szene."
+                el_handy "Gefällt dir, was du siehst? Dann komm schnell in den Park und hol dir den Rest!"
+            else:
+                el_handy "Genug geschaut, komm lieber live vorbei!"
+            jump handy_chat_elena
+        "Nach Sex verabreden / Einladen" if elena_korruption >= 25:
+            $ verabredung_wer = "Elena"
+            $ verabredung_ort = "Park"
+            el_handy "Perfekt! Ich gehe schon mal vor in das dichte Gebüsch hinter den Hecken. Beeil dich!"
+            jump handy_sms_menue
+        "Zurück":
+            jump handy_sms_menue
+
+
+label handy_chat_agnes:
+    menu:
+        "Stimmungs-Barometer abfragen":
+            m "Schwester Agnes, sind Sie in Gedanken beim Gebet?"
+            if agnes_korruption >= 40:
+                ag_handy "Meine Gebete kreisen nur noch um deine Berührungen, Max... Ich bin völlig hilflos und gehorsam gegenüber deinen Wünschen geworden."
+            elif agnes_korruption >= 20:
+                ag_handy "Mein Herz ist unruhig. Die Stille in der Kirche lenkt mich heute eher ab."
+            else:
+                ag_handy "Ich widme mich den heiligen Schriften und dem Dienst in der Gemeinde."
+            jump handy_chat_agnes
+        "Nach intimen Fotos fragen" if agnes_korruption >= 25:
+            m "Agnes, zeig mir, wie du in deiner privaten Kammer aussiehst."
+            if not hat_selfie_agnes:
+                $ hat_selfie_agnes = True
+                $ agnes_korruption += 12
+                ag_handy "Schwester Agnes sendet ein Text-Selfie aus der Sakristei. Sie hat ihre schwere Ordenstracht abgelegt und steht nur in schlichter weißer Unterwäsche da, ihre festen Brüste (85D) zeichnen sich deutlich ab."
+                ag_handy "Möge der Herr mir diese sündigen Gedanken vergeben... Du hast mich völlig verwandelt, Max."
+            else:
+                ag_handy "Ich darf nicht noch mehr Sünden über das Telefon begehen. Komm stattdessen zur Kirche."
+            jump handy_chat_agnes
+        "Zurück":
+            jump handy_sms_menue
+
+
+label stadtkirche:
+    "Du betrittst die kühle, andächtige Stadtkirche."
+    if agnes_test_bestanden:
+        jump agnes_schwanger_sex_menue
+    elif agnes_korruption >= 25:
+        jump agnes_erwachsenen_menue
+    else:
+        "In der Nähe des Altars triffst du auf Schwester Agnes."
+        ag "Guten Tag, junger Mann. Suchen Sie einen Ort für ein stilles Gebet?"
+        menu:
+            "Mit ihr über Glauben und das Leben sprechen (-10 Energie)":
+                $ energie -= 10
+                $ agnes_beziehung += 3
+                jump wohnheim_flur
+            "Ihre züchtige Schönheit loben":
+                $ agnes_korruption += 5
+                jump wohnheim_flur
+            "Zurück zum Wohnheim":
+                jump wohnheim_flur
+
+
+label agnes_erwachsenen_menue:
+    "Schwester Agnes führt dich in die kleine, abgeschiedene Sakristei hinter dem Altar."
+    ag "Max... mein Herz schlägt so schnell. Ich habe geschworen, als Jungfrau zu leben..."
+    menu:
+        "Das Event abbrechen und durch die Hintertür flüchten":
+            jump wohnheim_flur
+        "Zurück":
+            jump stadtkirche
+
+
+label agnes_schwanger_sex_menue:
+    ag "Max... ein kleines Wunder wächst in mir heran. Mein Körper sehnt sich im Schutz der Sakristei nach deiner Nähe..."
+    menu:
+        "Gehen":
+            jump wohnheim_flur
+        "Zurück":
+            jump stadtkirche
+
+
+label agnes_test_trigger_event:
+    $ agnes_test_verlangt = True
+    ag "Max... Bitte bring mir unauffällig einen Schwangerschaftstest in die Sakristei!"
+    jump wohnheim_flur
+
+
+label agnes_test_abgabe_label:
+    ag "Hast du den Schwangerschaftstest besorgt?"
+    menu:
+        "Ihr den Test geben" if "Schwangerschaftstest" in inventar:
+            $ inventar.remove("Schwangerschaftstest")
+            "Der Test ist POSITIV."
+            $ agnes_test_bestanden = True
             jump wohnheim_flur
         "Sagen, dass du noch keinen hast":
             jump wohnheim_flur
