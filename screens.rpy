@@ -7,16 +7,12 @@
 # ------------------------------------------------------------
 # Einheitliche GUI-Stile
 # ------------------------------------------------------------
-style default:
-    font "DejaVuSans.ttf"
-    size 20
-
 style hud_frame:
-    background Frame("gui/frame.png", 18, 18)
+    background Solid("#171b22")
     padding (18, 14)
 
 style stats_frame:
-    background Frame("gui/frame.png", 22, 22)
+    background Solid("#171b22")
     padding (38, 32)
 
 style choice_vbox:
@@ -27,6 +23,9 @@ style choice_button:
     xfill True
     yminimum 58
     padding (22, 14)
+    background Solid("#202631")
+    hover_background Solid("#303a4a")
+    insensitive_background Solid("#151920")
 
 style choice_button_text:
     size 22
@@ -35,7 +34,7 @@ style choice_button_text:
 
 # ------------------------------------------------------------
 # Eigene Darstellung der normalen Auswahlmenüs.
-# Die vorhandenen Choice-Texte werden 1:1 aus dem Script übernommen.
+# Die vorhandenen Choice-Texte werden unverändert aus dem Script übernommen.
 # ------------------------------------------------------------
 screen choice(items):
     zorder 100
@@ -46,6 +45,7 @@ screen choice(items):
         xmaximum 900
         xfill True
         padding (24, 24)
+        background Solid("#101318")
 
         vbox:
             style "choice_vbox"
@@ -53,6 +53,7 @@ screen choice(items):
             for item in items:
                 textbutton item.caption:
                     style "choice_button"
+                    text_style "choice_button_text"
                     action item.action
 
 # ------------------------------------------------------------
