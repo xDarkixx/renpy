@@ -1,20 +1,24 @@
+
 # =========================================================================
 # 1. CHARAKTERE DEFINIEREN
 # =========================================================================
 define m = Character("Max", color="#c8ffc8")
 define s = Character("Sarah", color="#ffc8c8")
 define k = Character("Frau Krause", color="#e0aaff")
+define b = Character("Frau Berg", color="#ffaa66") 
 define apo = Character("Apotheker", color="#aaffff")
 
 # Handy-Kontakte
 define s_handy = Character("Sarah (SMS)", color="#ffffc8")
 define k_handy = Character("Frau Krause (SMS)", color="#f0c8ff")
+define b_handy = Character("Frau Berg (SMS)", color="#ffd8aa")
 
 # =========================================================================
 # 2. STATISTIKEN, INVENTAR UND SYSTEM-VARIABLEN
 # =========================================================================
 default geld = 20
 default energie = 100
+default max_energie = 100 
 default tageszeit = "Morgen" # Morgen, Nachmittag, Abend, Nacht
 
 # Wochentage-System
@@ -41,6 +45,14 @@ default krause_schwanger = False
 default krause_tage_seit_sex = 0
 default krause_test_verlangt = False
 default krause_test_bestanden = False
+
+# Werte für die Lehrerin Frau Berg
+default berg_beziehung = 0
+default berg_korruption = 0
+default berg_schwanger = False
+default berg_tage_seit_sex = 0
+default berg_test_verlangt = False
+default berg_test_bestanden = False
 
 # Story-Flags
 default miete_bezahlt = False
@@ -75,6 +87,9 @@ label wohnheim_flur:
     if krause_schwanger and krause_tage_seit_sex >= 3 and not krause_test_verlangt:
         jump krause_test_trigger_event
 
+    if berg_schwanger and berg_tage_seit_sex >= 3 and not berg_test_trigger_event:
+        jump berg_test_trigger_event
+
     # ZUFÄLLIGES BETTEL-EVENT (Triggert nachts auf dem Flur, wenn Korruption sehr hoch ist)
     if tageszeit == "Nacht" and sarah_korruption >= 35 and renpy.random.randint(1, 100) <= 30:
         jump sarah_bettelt_event
@@ -82,10 +97,11 @@ label wohnheim_flur:
     if tageszeit == "Nacht" and krause_korruption >= 35 and renpy.random.randint(1, 100) <= 30:
         jump krause_bettelt_event
 
-    "Status: [tag_name] ([tageszeit]) | Geld: [geld]$ | Energie: [energie]%%"
+    "Status: [tag_name] ([tageszeit]) | Geld: [geld]$ | Energie: [energie]/[max_energie]"
     "Mädels-Status:"
     "Sarah - Korruption: [sarah_korruption] | Schwanger: [sarah_schwanger]"
     "Frau Krause - Korruption: [krause_korruption] | Schwanger: [krause_schwanger]"
+    "Frau Berg (Lehrerin) - Korruption: [berg_korruption] | Schwanger: [berg_schwanger]"
     
     if energie <= 0:
         "Du bist völlig erschöpft! Du musst dich in deinem Zimmer ausruhen."
@@ -110,6 +126,12 @@ label wohnheim_flur:
             
         "In das Büro der Vermieterin":
             jump krause_buero
+            
+        "Zur Universität gehen (Frau Berg)" if tageszeit == "Morgen" or tageszeit == "Nachmittag":
+            jump universitaet
+            
+        "Zum Sportstudio gehen" if tageszeit == "Nachmittag" or tageszeit == "Abend":
+            jump sportstudio
             
         "In die Gemeinschaftsdusche":
             jump gemeinschaftsdusche
@@ -156,6 +178,13 @@ label handy_menue:
             s_handy "Hey Max! Komm heute mal in mein Zimmer, wenn du Zeit hast."
             jump handy_menue
             
+        "Werte der Bewohnerinnen auslesen (Spionage-App)":
+            "--- DATENBANK ---"
+            "Sarah - Zuneigung: [sarah_beziehung] | Korruption: [sarah_korruption]"
+            "Frau Krause - Zuneigung: [krause_beziehung] | Korruption: [krause_korruption]"
+            "Frau Berg - Zuneigung: [berg_beziehung] | Korruption: [berg_korruption]"
+            jump handy_menue
+            
         "Sarah eine SMS schreiben" if neue_nachrichten_anzahl == 0:
             jump handy_sarah_chat
             
@@ -198,7 +227,7 @@ label rucksack_ansehen:
     jump mein_zimmer
 
 label mein_zimmer_schlafen:
-    $ energie = 100
+    $ energie = max_energie
     if tageszeit == "Morgen":
         $ tageszeit = "Nachmittag"
     elif tageszeit == "Nachmittag":
@@ -213,6 +242,8 @@ label mein_zimmer_schlafen:
             $ sarah_tage_seit_sex += 1
         if krause_korruption >= 25:
             $ krause_tage_seit_sex += 1
+        if berg_korruption >= 25:
+            $ berg_tage_seit_sex += 1
             
         $ aktueller_tag_index += 1
         if aktueller_tag_index > 6:
@@ -244,7 +275,7 @@ label apotheke:
 
 
 # =========================================================================
-# 7. ORT: SARAHS ZIMMER (UNZENSIERTER UNTERICHT)
+# 7. ORT: SARAHS ZIMMER
 # =========================================================================
 label sarahs_zimmer:
     "Du betrittst Sarahs Zimmer."
@@ -252,35 +283,3 @@ label sarahs_zimmer:
     if sarah_test_verlangt and not sarah_test_bestanden:
         jump sarah_test_abgabe_label
 
-    if tageszeit == "Nacht" and sarah_korruption < 10:
-        s "Max? Es ist mitten in der Nacht! Geh bitte..."
-        jump wohnheim_flur
-    elif tageszeit == "Nacht" and sarah_korruption >= 10:
-        s "Max... Schön, dass du dich nachts zu mir schleichst..."
-        if sarah_test_bestanden:
-            jump sarah_schwanger_sex_menue
-        else:
-            jump sarah_erwachsenen_menue
-    else:
-        if sarah_test_bestanden:
-            s "Oh Max! Unserem Baby geht es gut. Ich merke richtig, wie sich mein Körper verändert..."
-        else:
-            s "Oh, hey Max! Was gibt's?"
-        menu:
-            "Ihr die 'Pille danach' geben" if "Pille danach" in inventar and sarah_tage_seit_sex == 1 and not sarah_test_bestanden:
-                $ inventar.remove("Pille danach")
-                s "Oh danke, Max! Jetzt bin ich erleichtert."
-                $ sarah_schwanger = False
-                $ sarah_tage_seit_sex = 0
-                jump wohnheim_flur
-            "Mit ihr unterhalten (-10 Energie)":
-                $ energie -= 10
-                $ sarah_beziehung += 1
-                jump wohnheim_flur
-            "Zurück":
-                jump wohnheim_flur
-
-label sarah_erwachsenen_menue:
-    menu:
-        "Ihr Top ausziehen und an den Brüsten saugen" if sarah_korruption >= 12:
-            jump sarah_ausziehen_szene
